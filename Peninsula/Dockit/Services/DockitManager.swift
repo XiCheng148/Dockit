@@ -15,6 +15,7 @@ class DockitManager: ObservableObject {
             }
         }
     }
+    @Published var respectSpaces: Bool = true
     
     private let eventMonitor = DockitEventMonitor()
     
@@ -65,6 +66,12 @@ class DockitManager: ObservableObject {
     
     func handleMouseMovement(_ point: NSPoint) {
         dockedWindows.forEach { dockedWindow in
+            let isWindowVisible = isWindowVisibleOnScreen(dockedWindow.axWindow)
+            
+            if respectSpaces && !isWindowVisible {
+                return
+            }
+            
             let shouldShow = dockedWindow.isVisible 
                 ? dockedWindow.windowArea.contains(point)
                 : dockedWindow.triggerArea.contains(point)
@@ -104,6 +111,28 @@ class DockitManager: ObservableObject {
                 }
             }
         }
+    }
+    
+    private func isWindowVisibleOnScreen(_ window: AxWindow) -> Bool {
+        guard let frame = try? window.frame() else { return false }
+        
+        let screens = NSScreen.screens
+        
+        for screen in screens {
+            if screen.frame.intersects(frame) {
+                if let windowId = try? window.cgWindowId(),
+                   let windowList = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[CFString: Any]] {
+                    return windowList.contains { dict in
+                        if let id = dict[kCGWindowNumber] as? CGWindowID {
+                            return id == windowId
+                        }
+                        return false
+                    }
+                }
+            }
+        }
+        
+        return false
     }
     
     func dockActiveWindow(to edge: DockEdge) {
