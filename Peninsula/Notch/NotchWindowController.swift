@@ -27,7 +27,7 @@ class NotchWindowController: NSWindowController {
         contentViewController = NotchViewController(vm)
 
         if notchSize == .zero {
-            notchSize = .init(width: notchWidth, height: 24)
+            notchSize = .init(width: notchWidth, height: 2)
         }
         vm.deviceNotchRect = CGRect(
             x: screen.frame.origin.x + (screen.frame.width - notchSize.width) / 2,
