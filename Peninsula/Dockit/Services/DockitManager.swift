@@ -72,9 +72,14 @@ class DockitManager: ObservableObject {
                 return
             }
             
+            // 检查是否所有其他窗口都是隐藏状态
+            let allOtherWindowsHidden = dockedWindows
+                .filter { $0.id != dockedWindow.id }  // 排除当前窗口
+                .allSatisfy { !$0.isVisible }         // 检查是否都是隐藏状态
+            
             let shouldShow = dockedWindow.isVisible 
                 ? dockedWindow.windowArea.contains(point)
-                : dockedWindow.triggerArea.contains(point)
+                : (dockedWindow.triggerArea.contains(point) && allOtherWindowsHidden) // 增加条件：所有其他窗口都隐藏
                 
             if shouldShow != dockedWindow.isVisible {
                 var updatedWindow = dockedWindow
