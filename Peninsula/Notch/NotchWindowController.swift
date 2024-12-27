@@ -11,6 +11,8 @@ private let notchHeight: CGFloat = 800
 private let notchWidth: CGFloat = 150
 
 class NotchWindowController: NSWindowController {
+    static var shared: NotchWindowController?
+
     var vm: NotchViewModel?
     weak var screen: NSScreen?
 
@@ -27,7 +29,7 @@ class NotchWindowController: NSWindowController {
         contentViewController = NotchViewController(vm)
 
         if notchSize == .zero {
-            notchSize = .init(width: notchWidth, height: 24)
+            notchSize = .init(width: notchWidth, height: 0)
         }
         vm.deviceNotchRect = CGRect(
             x: screen.frame.origin.x + (screen.frame.width - notchSize.width) / 2,
@@ -43,6 +45,8 @@ class NotchWindowController: NSWindowController {
             vm?.cgScreenRect.origin.y = NSMaxY(NSScreen.screens[0].frame) - NSMaxY(screen.frame)
             if self.openAfterCreate { vm?.notchOpen(.tray) }
         }
+
+        NotchWindowController.shared = self
     }
 
     @available(*, unavailable)
@@ -71,6 +75,9 @@ class NotchWindowController: NSWindowController {
     }
 
     deinit {
+        if NotchWindowController.shared === self {
+            NotchWindowController.shared = nil
+        }
         destroy()
     }
 

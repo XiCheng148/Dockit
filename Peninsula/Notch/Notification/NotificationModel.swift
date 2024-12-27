@@ -110,6 +110,8 @@ class NotificationModel: ObservableObject {
                     self.displayedNum = self.total
                     self.displayedName = bundleId
                     
+                    NotchWindowController.shared?.vm?.notchPop()
+                    
                     let version = self.version
                     self.displayedVersion = version
                     self.version += 1
@@ -118,6 +120,7 @@ class NotificationModel: ObservableObject {
                         self.lock.withLock {
                             if self.displayedVersion == version {
                                 self.displayTotal()
+                                NotchWindowController.shared?.vm?.notchClose()
                             }
                         }
                     }

@@ -139,7 +139,7 @@ class NotchViewModel: NSObject, ObservableObject {
         case .popping:
             return .init(
                 width: deviceNotchRect.width + abstractSize + 6,
-                height: deviceNotchRect.height + 6
+                height: deviceNotchRect.height == 0 ? deviceNotchRect.height + 28 : deviceNotchRect.height + 6
             )
         }
     }
