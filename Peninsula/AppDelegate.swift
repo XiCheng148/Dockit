@@ -8,114 +8,86 @@
 import AppKit
 import Cocoa
 import LaunchAtLogin
+import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var isFirstOpen = true
     var isLaunchedAtLogin = false
-    //    var mainWindowController: NotchWindowController?
-    var windowControllers: [NotchWindowController] = []
     var counter = 0
 
     var timer: Timer?
 
     private var dockitManager: DockitManager?
+    private var settingsWindowController: NSWindowController?
+    private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_: Notification) {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(rebuildApplicationWindows),
-            name: NSApplication.didChangeScreenParametersNotification,
-            object: nil
-        )
         NSApp.setActivationPolicy(.accessory)
-
-        isLaunchedAtLogin = LaunchAtLogin.wasLaunchedAtLogin
-
-        _ = EventMonitors.shared
-        let timer = Timer.scheduledTimer(
-            withTimeInterval: 1,
-            repeats: true
-        ) { [weak self] _ in
-            self?.determineIfProcessIdentifierMatches()
-            self?.makeKeyAndVisibleIfNeeded()
-        }
-        self.timer = timer
-
-        rebuildApplicationWindows()
-
+        
         // 初始化 DockitManager
         dockitManager = DockitManager.shared
         
         // 注册快捷键
         DockitShortcuts.register()
+        
+        // 创建设置菜单
+        setupMenu()
+        
+        // 检查权限状态
+        checkAccessibilityPermission()
     }
 
-    func applicationWillTerminate(_: Notification) {
-        try? FileManager.default.removeItem(at: temporaryDirectory)
-        try? FileManager.default.removeItem(at: pidFile)
-    }
-
-    func findScreenFitsOurNeeds() -> NSScreen? {
-        if let screen = NSScreen.buildin, screen.notchSize != .zero { return screen }
-        return .main
-    }
-
-    @objc func rebuildApplicationWindows() {
-        let app = NSRunningApplication.current
-        defer { isFirstOpen = false }
-        for windowController in windowControllers {
-            windowController.destroy()
+    private func setupMenu() {
+        let menu = NSMenu()
+        
+        menu.addItem(NSMenuItem(title: "设置", action: #selector(openSettings), keyEquivalent: ","))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "退出", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem?.button {
+            button.title = "⚓️"
         }
-        windowControllers = []
-        let screens = NSScreen.screens
-        for screen in screens {
-            let windowController = NotchWindowController.init(screen: screen, app: app)
-            if isFirstOpen, !isLaunchedAtLogin {
-                windowController.openAfterCreate = true
-            }
-            windowControllers.append(windowController)
-        }
-        EventMonitors.shared.hotKeyEvent.start()
-
-        //        if let mainWindowController {
-        //            mainWindowController.destroy()
-        //        }
-        //        mainWindowController = nil
-        //        guard let mainScreen = findScreenFitsOurNeeds() else { return }
-        //        mainWindowController = .init(screen: mainScreen)
-        //        if isFirstOpen, !isLaunchedAtLogin {
-        //            mainWindowController?.openAfterCreate = true
-        //        }
+        statusItem?.menu = menu
     }
 
-    func determineIfProcessIdentifierMatches() {
-        let pid = String(NSRunningApplication.current.processIdentifier)
-        let content = (try? String(contentsOf: pidFile)) ?? ""
-        guard
-            pid.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                == content.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        else {
-            NSApp.terminate(nil)
-            return
+    @objc private func openSettings() {
+        if settingsWindowController == nil {
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
+                styleMask: [.titled, .closable],
+                backing: .buffered,
+                defer: false
+            )
+            window.title = "Dockit 设置"
+            window.center()
+            window.level = .floating
+            
+            let hostingView = NSHostingView(rootView: DockitSettingsView())
+            window.contentView = hostingView
+            
+            let windowController = NSWindowController(window: window)
+            settingsWindowController = windowController
+            
+            window.isReleasedWhenClosed = false
         }
+        
+        settingsWindowController?.showWindow(nil)
+        if let window = settingsWindowController?.window {
+            window.orderFrontRegardless()
+            window.makeKey()
+        }
+        NSApp.activate(ignoringOtherApps: true)
     }
 
-    func makeKeyAndVisibleIfNeeded() {
-        for windowController in windowControllers {
-            guard let window = windowController.window,
-                let vm = windowController.vm,
-                vm.status == .opened
-            else { return }
-            window.makeKeyAndOrderFront(nil)
-        }
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
     }
 
-    func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
-        for windowController in windowControllers {
-            guard let vm = windowController.vm
-            else { return true }
-            vm.notchOpen(.tray)
+    private func checkAccessibilityPermission() {
+        if !AccessibilityHelper.shared.checkAccessibility() {
+            // 自动打开设置窗口
+            openSettings()
         }
-        return true
     }
 }

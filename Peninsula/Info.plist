@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
   <key>NSAppleEventsUsageDescription</key>
-  <string>Peninsula needs to control System Events</string>
+  <string>Peninsula 需要辅助功能权限来管理窗口</string>
 	<key>NSServices</key>
 	<array>
 		<dict>
@@ -11,5 +11,7 @@
 			<dict/>
 		</dict>
 	</array>
+	<key>LSUIElement</key>
+	<true/>
 </dict>
 </plist>
