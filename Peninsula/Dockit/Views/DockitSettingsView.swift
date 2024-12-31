@@ -6,6 +6,8 @@ struct DockitSettingsView: View {
     @State private var showingRestartAlert: Bool = false
     @State private var cancellables = Set<AnyCancellable>()
     
+    @ObservedObject private var manager = DockitManager.shared
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -23,6 +25,55 @@ struct DockitSettingsView: View {
             .padding(.horizontal)
             
             Divider()
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Toggle("启用窗口停靠", isOn: $manager.isEnabled)
+                    .font(.system(size: 14))
+            }
+            .padding(.horizontal)
+            
+            Divider()
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("高级设置")
+                    .font(.system(size: 14, weight: .medium))
+                
+                HStack {
+                    Text("露出像素")
+                        .font(.system(size: 14))
+                    Spacer()
+                    TextField("", value: $manager.exposedPixels, formatter: NumberFormatter())
+                        .frame(width: 60)
+                        .textFieldStyle(.roundedBorder)
+                        .help("停靠时窗口露出的像素数")
+                }
+                
+                HStack {
+                    Text("触发区域宽度")
+                        .font(.system(size: 14))
+                    Spacer()
+                    TextField("", value: $manager.triggerAreaWidth, formatter: NumberFormatter())
+                        .frame(width: 60)
+                        .textFieldStyle(.roundedBorder)
+                        .help("鼠标触发展开的区域宽度，越高越容易误触")
+                }
+                
+                HStack {
+                    Text("鼠标监听频率")
+                        .font(.system(size: 14))
+                    Spacer()
+                    Picker("", selection: $manager.fps) {
+                        Text("节能 (4fps)").tag(4.0)
+                        Text("平衡 (10fps)").tag(10.0)
+                        Text("流畅 (30fps)").tag(30.0)
+                        Text("跟手 (60fps)").tag(60.0)
+                        Text("丝滑 (120fps)").tag(120.0)
+                    }
+                    .frame(width: 120)
+                    .help("更高的频率会更流畅但多的 cpu 占用")
+                }
+            }
+            .padding(.horizontal)
         }
         .frame(width: 300)
         .onAppear {

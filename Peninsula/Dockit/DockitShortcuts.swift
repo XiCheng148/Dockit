@@ -15,7 +15,6 @@ class DockitShortcuts {
                 DockitLogger.shared.logShortcut(.right)
                 DockitManager.shared.dockActiveWindow(to: .right)
             case 4:  // H 键
-                DockitLogger.shared.logUndockAllShortcut()
                 DockitManager.shared.undockAllWindows()
             default:
                 break

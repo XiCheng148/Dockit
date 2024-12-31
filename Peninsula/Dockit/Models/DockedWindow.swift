@@ -33,7 +33,7 @@ struct DockedWindow: Identifiable {
             case kAXUIElementDestroyedNotification:
                 // 窗口关闭时取消停靠
                 if let id = manager.dockedWindows.first(where: { $0.axWindow == axWindow })?.id {
-                    manager.undockWindow(id)
+                    manager.undockWindow(id, reason: .windowClosed)
                 }
                 
             case kAXWindowMovedNotification:
@@ -67,7 +67,11 @@ struct DockedWindow: Identifiable {
                     
                     // 只有不是正常的停靠移动，且超过阈值时才取消停靠
                     if !isNormalDockMovement && distance > 50 {
-                        DockitLogger.shared.logWindowMoved(try? axWindow.title(), distance: distance)
+                        DockitLogger.shared.logWindowMoved(
+                            try? axWindow.title(),
+                            distance: distance,
+                            frame: try? axWindow.frame()
+                        )
                         manager.undockWindow(dockedWindow.id, reason: .dragDistance)
                     }
                 }

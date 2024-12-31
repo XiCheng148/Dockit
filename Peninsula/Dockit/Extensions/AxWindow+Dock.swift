@@ -7,6 +7,7 @@ extension AxWindow {
         let axValue = AXValueCreate(.cgPoint, &point)!
         let result = AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, axValue)
         if result != .success {
+            DockitLogger.shared.logError("设置窗口位置失败")
             throw AxError.runtimeError
         }
     }
@@ -16,6 +17,7 @@ extension AxWindow {
         let axValue = AXValueCreate(.cgSize, &cgSize)!
         let result = AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, axValue)
         if result != .success {
+            DockitLogger.shared.logError("设置窗口大小失败")
             throw AxError.runtimeError
         }
     }
@@ -23,7 +25,10 @@ extension AxWindow {
     func dockTo(_ edge: DockEdge, exposedPixels: CGFloat) {
         guard let currentFrame = try? frame(),
               let screen = NSScreen.main 
-        else { return }
+        else {
+            DockitLogger.shared.logError("无法获取窗口或屏幕信息")
+            return
+        }
         
         let newFrame = calculateDockFrame(
             currentFrame: currentFrame,
@@ -32,8 +37,12 @@ extension AxWindow {
             exposedPixels: exposedPixels
         )
         
-        try? setPosition(newFrame.origin)
-        // try? setSize(newFrame.size)
+        do {
+            try setPosition(newFrame.origin)
+            DockitLogger.shared.logInfo("窗口已移动到目标位置：\(newFrame.origin)")
+        } catch {
+            DockitLogger.shared.logError("停靠窗口失败", error: error)
+        }
     }
     
     private func calculateDockFrame(

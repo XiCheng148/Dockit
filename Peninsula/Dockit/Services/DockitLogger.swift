@@ -1,5 +1,19 @@
 import Foundation
 
+enum LogType {
+    case action
+    case info
+    case error
+    
+    var prefix: String {
+        switch self {
+        case .action: return "🎯"
+        case .info: return "ℹ️"
+        case .error: return "⚠️"
+        }
+    }
+}
+
 class DockitLogger {
     static let shared = DockitLogger()
     
@@ -13,45 +27,69 @@ class DockitLogger {
     
     private init() {}
     
-    func log(_ message: String) {
+    private func log(_ type: LogType, _ message: String) {
         guard isEnabled else { return }
         let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-        print("[\(timestamp)] \(message)")
+        print("[\(timestamp)] \(type.prefix) \(message)")
     }
     
     // MARK: - 快捷键事件
     func logShortcut(_ edge: DockEdge) {
-        log("⌨️ 快捷键触发：停靠到\(edge == .left ? "左" : "右")边缘")
+        log(.action, "快捷键：⌘⇧\(edge == .left ? "←" : "→")")
     }
     
     func logUndockAllShortcut() {
-        log("⌨️ 快捷键触发：取消所有停靠")
+        log(.action, "快捷键：⌘⇧H")
     }
     
     // MARK: - 窗口事件
-    func logWindowDocked(_ title: String?, edge: DockEdge) {
-        log("📌 窗口停靠：\(title ?? "未知窗口") -> \(edge == .left ? "左" : "右")边缘")
-    }
-    
-    func logWindowShown(_ title: String?) {
-        log("👀 窗口展开：\(title ?? "未知窗口")")
-    }
-    
-    func logWindowHidden(_ title: String?) {
-        log("🙈 窗口收起：\(title ?? "未知窗口")")
-    }
-    
-    func logWindowUndocked(_ title: String?, reason: UndockReason) {
-        let reasonText = switch reason {
-        case .userAction: "用户手动取消"
-        case .windowClosed: "窗口关闭"
-        case .dragDistance: "拖拽距离超过阈值"
+    func logWindowDocked(_ title: String?, edge: DockEdge, frame: CGRect?) {
+        if let title = title, let frame = frame {
+            log(.action, "停靠窗口「\(title)」-> \(edge == .left ? "左" : "右") [位置: \(Int(frame.origin.x)),\(Int(frame.origin.y)) 大小: \(Int(frame.width))×\(Int(frame.height))]")
         }
-        log("🔓 窗口取消停靠：\(title ?? "未知窗口") - 原因：\(reasonText)")
     }
     
-    func logWindowMoved(_ title: String?, distance: CGFloat) {
-        log("🔄 窗口移动：\(title ?? "未知窗口") - 距离：\(Int(distance))px")
+    func logWindowShown(_ title: String?, frame: CGRect?) {
+        if let title = title, let frame = frame {
+            log(.action, "展开窗口「\(title)」[位置: \(Int(frame.origin.x)),\(Int(frame.origin.y))]")
+        }
+    }
+    
+    func logWindowHidden(_ title: String?, frame: CGRect?) {
+        if let title = title, let frame = frame {
+            log(.action, "收起窗口「\(title)」[位置: \(Int(frame.origin.x)),\(Int(frame.origin.y))]")
+        }
+    }
+    
+    func logWindowUndocked(_ title: String?, reason: UndockReason, frame: CGRect?) {
+        let reasonText = switch reason {
+        case .userAction: "快捷键"
+        case .windowClosed: "窗口关闭"
+        case .dragDistance: "拖拽超出"
+        }
+        if let title = title, let frame = frame {
+            log(.action, "取消停靠「\(title)」- \(reasonText) [位置: \(Int(frame.origin.x)),\(Int(frame.origin.y))]")
+        }
+    }
+    
+    func logWindowMoved(_ title: String?, distance: CGFloat, frame: CGRect?) {
+        if let title = title, let frame = frame {
+            log(.info, "窗口移动「\(title)」- 距离: \(Int(distance))px [位置: \(Int(frame.origin.x)),\(Int(frame.origin.y))]")
+        }
+    }
+    
+    // MARK: - 错误日志
+    func logError(_ message: String, error: Error? = nil) {
+        if let error = error {
+            log(.error, "\(message) [\(error.localizedDescription)]")
+        } else {
+            log(.error, message)
+        }
+    }
+    
+    // MARK: - 信息日志
+    func logInfo(_ message: String) {
+        log(.info, message)
     }
 }
 
