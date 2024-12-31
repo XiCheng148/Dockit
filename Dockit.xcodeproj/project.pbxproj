@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 460E59EA2D2448C000787017 /* KeyboardShortcuts */; };
+		46A1EF242D2471EF00E83601 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF232D2471EF00E83601 /* Defaults */; };
+		46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF252D2471EF00E83601 /* DefaultsMacros */; };
 		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
 		64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF852CFECEE4000429A4 /* ColorfulX */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
@@ -34,6 +36,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */,
+				46A1EF242D2471EF00E83601 /* Defaults in Frameworks */,
 				64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */,
 				460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */,
 				64EBAF832CFECECE000429A4 /* Atomics in Frameworks */,
@@ -98,6 +102,8 @@
 				64EBAF8E2CFECF09000429A4 /* Pow */,
 				64EBAF922CFECF26000429A4 /* OrderedCollections */,
 				460E59EA2D2448C000787017 /* KeyboardShortcuts */,
+				46A1EF232D2471EF00E83601 /* Defaults */,
+				46A1EF252D2471EF00E83601 /* DefaultsMacros */,
 			);
 			productName = Dockit;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Dockit.app */;
@@ -134,6 +140,7 @@
 				64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */,
 				64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -384,6 +391,14 @@
 				kind = branch;
 			};
 		};
+		46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-atomics.git";
@@ -431,6 +446,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		46A1EF232D2471EF00E83601 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
+		};
+		46A1EF252D2471EF00E83601 /* DefaultsMacros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = DefaultsMacros;
 		};
 		64EBAF822CFECECE000429A4 /* Atomics */ = {
 			isa = XCSwiftPackageProductDependency;

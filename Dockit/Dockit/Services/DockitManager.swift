@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import SwiftUI
+import Defaults
 
 class DockitManager: ObservableObject {
     static let shared = DockitManager()
@@ -16,33 +17,69 @@ class DockitManager: ObservableObject {
             }
         }
     }
-    @Published var exposedPixels: Double = 10 {
-        didSet {
+    
+    @Published private var _exposedPixels: Double
+    var exposedPixels: Double {
+        get { _exposedPixels }
+        set {
+            _exposedPixels = newValue
+            Defaults[.exposedPixels] = Int(newValue)
             // 当设置改变时更新所有已停靠窗口
             dockedWindows.forEach { window in
-                window.axWindow.dockTo(window.edge, exposedPixels: exposedPixels)
+                window.axWindow.dockTo(window.edge, exposedPixels: newValue)
             }
         }
     }
-    @Published var triggerAreaWidth: Double = 10
-    @Published var isEnabled: Bool = true {
-        didSet {
-            if !isEnabled {
+    
+    @Published private var _triggerAreaWidth: Double
+    var triggerAreaWidth: Double {
+        get { _triggerAreaWidth }
+        set {
+            _triggerAreaWidth = newValue
+            Defaults[.triggerAreaWidth] = Int(newValue)
+        }
+    }
+    
+    @Published private var _isEnabled: Bool
+    var isEnabled: Bool {
+        get { _isEnabled }
+        set {
+            _isEnabled = newValue
+            Defaults[.isEnabled] = newValue
+            if !newValue {
                 undockAllWindows()
             }
         }
     }
-    @Published var respectSpaces: Bool = true
-    @Published var fps: Double = 30 {
-        didSet {
-            // 更新事件监听器的 FPS
-            eventMonitor.updateFPS(fps)
+    
+    @Published private var _respectSpaces: Bool
+    var respectSpaces: Bool {
+        get { _respectSpaces }
+        set {
+            _respectSpaces = newValue
+            Defaults[.respectSpaces] = newValue
+        }
+    }
+    
+    @Published private var _fps: Double
+    var fps: Double {
+        get { _fps }
+        set {
+            _fps = newValue
+            Defaults[.fps] = Int(newValue)
+            eventMonitor.updateFPS(newValue)
         }
     }
     
     private let eventMonitor = DockitEventMonitor()
     
     private init() {
+        self._exposedPixels = Double(Defaults[.exposedPixels])
+        self._triggerAreaWidth = Double(Defaults[.triggerAreaWidth])
+        self._isEnabled = Defaults[.isEnabled]
+        self._respectSpaces = Defaults[.respectSpaces]
+        self._fps = Double(Defaults[.fps])
+        
         DockitLogger.shared.logInfo("DockitManager 初始化 - 露出像素: \(exposedPixels)px, 触发区域宽度: \(triggerAreaWidth)px")
     }
     

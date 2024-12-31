@@ -15,24 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_: Notification) {
-        NSApp.setActivationPolicy(.accessory)
-        
-        // 添加关闭窗口的快捷键支持
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            if event.modifierFlags.contains(.command) {
-                if event.charactersIgnoringModifiers == "w" {
-                    if let window = NSApp.keyWindow {
-                        window.close()
-                        return nil
-                    }
-                }
-                if event.charactersIgnoringModifiers == "q" {
-                    NSApplication.shared.terminate(nil)
-                    return nil
-                }
-            }
-            return event
-        }
+        NSApp.setActivationPolicy(.prohibited)
         
         // 初始化 DockitManager
         dockitManager = DockitManager.shared
@@ -42,7 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // 创建设置菜单
         setupMenu()
-        
+
         // 检查权限状态
         checkAccessibilityPermission()
     }
@@ -56,7 +39,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
-            button.title = "⚓️"
+            button.image = NSImage(systemSymbolName: "rectangle.lefthalf.filled", accessibilityDescription: "Dockit")
+            button.image?.size = NSSize(width: 18, height: 18)
         }
         statusItem?.menu = menu
     }
@@ -72,9 +56,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.title = "Dockit 设置"
             window.center()
             window.isMovableByWindowBackground = true
-            
-            // 添加关闭窗口的代理
-            window.delegate = self
             
             let hostingView = NSHostingView(rootView: DockitSettingsView())
             window.contentView = hostingView
@@ -102,11 +83,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // 自动打开设置窗口
             openSettings()
         }
-    }
-}
-
-extension AppDelegate: NSWindowDelegate {
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        return true
     }
 }
