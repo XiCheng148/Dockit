@@ -1,10 +1,3 @@
-//
-//  AxEventHandler.swift
-//  Island
-//
-//  Created by Celve on 9/22/24.
-//
-
 import Cocoa
 import ApplicationServices.HIServices.AXUIElement
 import ApplicationServices.HIServices.AXNotificationConstants

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
   <key>NSAppleEventsUsageDescription</key>
-  <string>Peninsula 需要辅助功能权限来管理窗口</string>
+  <string>Dockit 需要辅助功能权限来管理窗口</string>
 	<key>NSServices</key>
 	<array>
 		<dict>

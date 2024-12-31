@@ -14,7 +14,7 @@ enum HotKeyEvent {
 }
 
 class HotKeyObserver {
-    let signature = "peninsula".utf16.reduce(0) { ($0 << 8) + OSType($1) }
+    let signature = "Dockit".utf16.reduce(0) { ($0 << 8) + OSType($1) }
     let shortcutEventTarget = GetEventDispatcherTarget()
     var hotKeyPressedEventHandler: EventHandlerRef?
     var hotKeyReleasedEventHandler: EventHandlerRef?

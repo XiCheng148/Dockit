@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  NotchDrop
-//
-//  Created by 秋星桥 on 2024/7/7.
-//
-
 import AppKit
 import Cocoa
 import LaunchAtLogin
@@ -24,6 +17,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         NSApp.setActivationPolicy(.accessory)
         
+        // 添加关闭窗口的快捷键支持
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            if event.modifierFlags.contains(.command) {
+                if event.charactersIgnoringModifiers == "w" {
+                    if let window = NSApp.keyWindow {
+                        window.close()
+                        return nil
+                    }
+                }
+                if event.charactersIgnoringModifiers == "q" {
+                    NSApplication.shared.terminate(nil)
+                    return nil
+                }
+            }
+            return event
+        }
+        
         // 初始化 DockitManager
         dockitManager = DockitManager.shared
         
@@ -40,9 +50,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupMenu() {
         let menu = NSMenu()
         
-        menu.addItem(NSMenuItem(title: "设置", action: #selector(openSettings), keyEquivalent: ","))
+        menu.addItem(NSMenuItem(title: "设置", action: #selector(openSettings), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "退出", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "退出", action: #selector(NSApplication.terminate(_:)), keyEquivalent: ""))
         
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
@@ -55,13 +65,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if settingsWindowController == nil {
             let window = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
-                styleMask: [.titled, .closable],
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             window.title = "Dockit 设置"
             window.center()
-            window.level = .floating
+            window.isMovableByWindowBackground = true
+            
+            // 添加关闭窗口的代理
+            window.delegate = self
             
             let hostingView = NSHostingView(rootView: DockitSettingsView())
             window.contentView = hostingView
@@ -89,5 +102,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // 自动打开设置窗口
             openSettings()
         }
+    }
+}
+
+extension AppDelegate: NSWindowDelegate {
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        return true
     }
 }

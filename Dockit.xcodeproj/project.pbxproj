@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 460E59EA2D2448C000787017 /* KeyboardShortcuts */; };
 		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
 		64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF852CFECEE4000429A4 /* ColorfulX */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
@@ -16,14 +17,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		64EBAE7F2CFECD56000429A4 /* Peninsula.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Peninsula.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		64EBAE7F2CFECD56000429A4 /* Dockit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dockit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64EBAF942CFECF7E000429A4 /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../../../../../System/Library/PrivateFrameworks/SkyLight.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		64EBAE812CFECD56000429A4 /* Peninsula */ = {
+		64EBAE812CFECD56000429A4 /* Dockit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Peninsula;
+			path = Dockit;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +35,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */,
+				460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */,
 				64EBAF832CFECECE000429A4 /* Atomics in Frameworks */,
 				64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */,
 				64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */,
@@ -48,7 +50,7 @@
 		64EBAE762CFECD56000429A4 = {
 			isa = PBXGroup;
 			children = (
-				64EBAE812CFECD56000429A4 /* Peninsula */,
+				64EBAE812CFECD56000429A4 /* Dockit */,
 				64EBAF912CFECF26000429A4 /* Frameworks */,
 				64EBAE802CFECD56000429A4 /* Products */,
 			);
@@ -57,7 +59,7 @@
 		64EBAE802CFECD56000429A4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				64EBAE7F2CFECD56000429A4 /* Peninsula.app */,
+				64EBAE7F2CFECD56000429A4 /* Dockit.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -73,9 +75,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		64EBAE7E2CFECD56000429A4 /* Peninsula */ = {
+		64EBAE7E2CFECD56000429A4 /* Dockit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64EBAE8E2CFECD57000429A4 /* Build configuration list for PBXNativeTarget "Peninsula" */;
+			buildConfigurationList = 64EBAE8E2CFECD57000429A4 /* Build configuration list for PBXNativeTarget "Dockit" */;
 			buildPhases = (
 				64EBAE7B2CFECD56000429A4 /* Sources */,
 				64EBAE7C2CFECD56000429A4 /* Frameworks */,
@@ -86,18 +88,19 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				64EBAE812CFECD56000429A4 /* Peninsula */,
+				64EBAE812CFECD56000429A4 /* Dockit */,
 			);
-			name = Peninsula;
+			name = Dockit;
 			packageProductDependencies = (
 				64EBAF822CFECECE000429A4 /* Atomics */,
 				64EBAF852CFECEE4000429A4 /* ColorfulX */,
 				64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */,
 				64EBAF8E2CFECF09000429A4 /* Pow */,
 				64EBAF922CFECF26000429A4 /* OrderedCollections */,
+				460E59EA2D2448C000787017 /* KeyboardShortcuts */,
 			);
-			productName = Peninsula;
-			productReference = 64EBAE7F2CFECD56000429A4 /* Peninsula.app */;
+			productName = Dockit;
+			productReference = 64EBAE7F2CFECD56000429A4 /* Dockit.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -115,7 +118,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 64EBAE7A2CFECD56000429A4 /* Build configuration list for PBXProject "Peninsula" */;
+			buildConfigurationList = 64EBAE7A2CFECD56000429A4 /* Build configuration list for PBXProject "Dockit" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -130,13 +133,14 @@
 				64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */,
 				64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				64EBAE7E2CFECD56000429A4 /* Peninsula */,
+				64EBAE7E2CFECD56000429A4 /* Dockit */,
 			);
 		};
 /* End PBXProject section */
@@ -285,12 +289,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Peninsula/Peninsula.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Dockit/Dockit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 6;
-				DEVELOPMENT_ASSET_PATHS = "\"Peninsula/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Dockit/Preview Content\"";
 				DEVELOPMENT_TEAM = 8QL76STYD6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -302,7 +306,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Celve.Peninsula;
+				PRODUCT_BUNDLE_IDENTIFIER = XiCheng.Dockit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -319,12 +323,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Peninsula/Peninsula.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Dockit/Dockit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 6;
-				DEVELOPMENT_ASSET_PATHS = "\"Peninsula/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Dockit/Preview Content\"";
 				DEVELOPMENT_TEAM = 8QL76STYD6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -336,7 +340,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Celve.Peninsula;
+				PRODUCT_BUNDLE_IDENTIFIER = XiCheng.Dockit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -351,7 +355,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		64EBAE7A2CFECD56000429A4 /* Build configuration list for PBXProject "Peninsula" */ = {
+		64EBAE7A2CFECD56000429A4 /* Build configuration list for PBXProject "Dockit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64EBAE8C2CFECD57000429A4 /* Debug */,
@@ -360,7 +364,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64EBAE8E2CFECD57000429A4 /* Build configuration list for PBXNativeTarget "Peninsula" */ = {
+		64EBAE8E2CFECD57000429A4 /* Build configuration list for PBXNativeTarget "Dockit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64EBAE8F2CFECD57000429A4 /* Debug */,
@@ -372,6 +376,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-atomics.git";
@@ -415,6 +427,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		460E59EA2D2448C000787017 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
 		64EBAF822CFECECE000429A4 /* Atomics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */;
