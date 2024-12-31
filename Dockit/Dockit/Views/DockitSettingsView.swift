@@ -175,28 +175,26 @@ struct DockitSettingsView: View {
             }
             
             Section(header: Text("快捷键").font(.headline)) {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("左侧停靠")
-                        Spacer()
-                        KeyboardShortcuts.Recorder(for: .dockLeft)
-                    }
-                    .help("将当前窗口停靠到左侧")
-                    
-                    HStack {
-                        Text("右侧停靠")
-                        Spacer()
-                        KeyboardShortcuts.Recorder(for: .dockRight)
-                    }
-                    .help("将当前窗口停靠到右侧")
-                    
-                    HStack {
-                        Text("取消停靠")
-                        Spacer()
-                        KeyboardShortcuts.Recorder(for: .undockAll)
-                    }
-                    .help("取消所有已停靠的窗口")
+                HStack {
+                    Text("左侧停靠")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .dockLeft)
                 }
+                .help("将当前窗口停靠到左侧")
+                
+                HStack {
+                    Text("右侧停靠")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .dockRight)
+                }
+                .help("将当前窗口停靠到右侧")
+                
+                HStack {
+                    Text("取消停靠")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .undockAll)
+                }
+                .help("取消所有已停靠的窗口")
             }
         }
         .formStyle(.grouped)
