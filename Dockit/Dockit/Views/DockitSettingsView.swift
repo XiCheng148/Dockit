@@ -179,6 +179,9 @@ struct DockitSettingsView: View {
                     Text("左侧停靠")
                     Spacer()
                     KeyboardShortcuts.Recorder(for: .dockLeft)
+                        .onAppear {
+                            activateWindow()
+                        }
                 }
                 .help("将当前窗口停靠到左侧")
                 
@@ -186,6 +189,9 @@ struct DockitSettingsView: View {
                     Text("右侧停靠")
                     Spacer()
                     KeyboardShortcuts.Recorder(for: .dockRight)
+                        .onAppear {
+                            activateWindow()
+                        }
                 }
                 .help("将当前窗口停靠到右侧")
                 
@@ -193,6 +199,9 @@ struct DockitSettingsView: View {
                     Text("取消停靠")
                     Spacer()
                     KeyboardShortcuts.Recorder(for: .undockAll)
+                        .onAppear {
+                            activateWindow()
+                        }
                 }
                 .help("取消所有已停靠的窗口")
             }
@@ -202,6 +211,10 @@ struct DockitSettingsView: View {
         .onAppear {
             setupAccessibilityMonitoring()
             activateWindow()
+            NSApp.setActivationPolicy(.regular)
+        }
+        .onDisappear {
+            NSApp.setActivationPolicy(.prohibited)
         }
         .alert("需要重启应用", isPresented: $showingRestartAlert) {
             Button("稍后重启") {
@@ -218,7 +231,8 @@ struct DockitSettingsView: View {
     private func activateWindow() {
         DispatchQueue.main.async {
             if let window = NSApp.windows.first(where: { $0.contentView?.subviews.contains(where: { $0 is NSHostingView<DockitSettingsView> }) ?? false }) {
-                window.orderFront(nil)
+                window.level = .floating
+                window.orderFrontRegardless()
                 NSApp.activate(ignoringOtherApps: true)
             }
         }
