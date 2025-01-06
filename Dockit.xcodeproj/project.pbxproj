@@ -10,11 +10,7 @@
 		460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 460E59EA2D2448C000787017 /* KeyboardShortcuts */; };
 		46A1EF242D2471EF00E83601 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF232D2471EF00E83601 /* Defaults */; };
 		46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF252D2471EF00E83601 /* DefaultsMacros */; };
-		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
-		64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF852CFECEE4000429A4 /* ColorfulX */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
-		64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8E2CFECF09000429A4 /* Pow */; };
-		64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF922CFECF26000429A4 /* OrderedCollections */; };
 		64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64EBAF942CFECF7E000429A4 /* SkyLight.framework */; };
 /* End PBXBuildFile section */
 
@@ -38,11 +34,7 @@
 			files = (
 				46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */,
 				46A1EF242D2471EF00E83601 /* Defaults in Frameworks */,
-				64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */,
 				460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */,
-				64EBAF832CFECECE000429A4 /* Atomics in Frameworks */,
-				64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */,
-				64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */,
 				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
 				64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */,
 			);
@@ -96,11 +88,7 @@
 			);
 			name = Dockit;
 			packageProductDependencies = (
-				64EBAF822CFECECE000429A4 /* Atomics */,
-				64EBAF852CFECEE4000429A4 /* ColorfulX */,
 				64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */,
-				64EBAF8E2CFECF09000429A4 /* Pow */,
-				64EBAF922CFECF26000429A4 /* OrderedCollections */,
 				460E59EA2D2448C000787017 /* KeyboardShortcuts */,
 				46A1EF232D2471EF00E83601 /* Defaults */,
 				46A1EF252D2471EF00E83601 /* DefaultsMacros */,
@@ -134,11 +122,7 @@
 			mainGroup = 64EBAE762CFECD56000429A4;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
-				64EBAF842CFECEE4000429A4 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
-				64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */,
-				64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */,
 			);
@@ -399,44 +383,12 @@
 				minimumVersion = 9.0.0;
 			};
 		};
-		64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-atomics.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
-			};
-		};
-		64EBAF842CFECEE4000429A4 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Lakr233/ColorfulX.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.5.2;
-			};
-		};
 		64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
 			requirement = {
 				branch = main;
 				kind = branch;
-			};
-		};
-		64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/EmergeTools/Pow";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.5;
-			};
-		};
-		64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-collections.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -457,30 +409,10 @@
 			package = 46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = DefaultsMacros;
 		};
-		64EBAF822CFECECE000429A4 /* Atomics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */;
-			productName = Atomics;
-		};
-		64EBAF852CFECEE4000429A4 /* ColorfulX */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 64EBAF842CFECEE4000429A4 /* XCRemoteSwiftPackageReference "ColorfulX" */;
-			productName = ColorfulX;
-		};
 		64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
 			productName = LaunchAtLogin;
-		};
-		64EBAF8E2CFECF09000429A4 /* Pow */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */;
-			productName = Pow;
-		};
-		64EBAF922CFECF26000429A4 /* OrderedCollections */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = OrderedCollections;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
