@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 460E59EA2D2448C000787017 /* KeyboardShortcuts */; };
+		4626147F2D350213006CBF81 /* DynamicNotchKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4626147E2D350213006CBF81 /* DynamicNotchKit */; };
 		46A1EF242D2471EF00E83601 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF232D2471EF00E83601 /* Defaults */; };
 		46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF252D2471EF00E83601 /* DefaultsMacros */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
@@ -32,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4626147F2D350213006CBF81 /* DynamicNotchKit in Frameworks */,
 				46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */,
 				46A1EF242D2471EF00E83601 /* Defaults in Frameworks */,
 				460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */,
@@ -92,6 +94,7 @@
 				460E59EA2D2448C000787017 /* KeyboardShortcuts */,
 				46A1EF232D2471EF00E83601 /* Defaults */,
 				46A1EF252D2471EF00E83601 /* DefaultsMacros */,
+				4626147E2D350213006CBF81 /* DynamicNotchKit */,
 			);
 			productName = Dockit;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Dockit.app */;
@@ -125,6 +128,7 @@
 				64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */,
+				4626147D2D350213006CBF81 /* XCRemoteSwiftPackageReference "DynamicNotchKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -375,6 +379,14 @@
 				kind = branch;
 			};
 		};
+		4626147D2D350213006CBF81 /* XCRemoteSwiftPackageReference "DynamicNotchKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MrKai77/DynamicNotchKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
@@ -398,6 +410,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		4626147E2D350213006CBF81 /* DynamicNotchKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4626147D2D350213006CBF81 /* XCRemoteSwiftPackageReference "DynamicNotchKit" */;
+			productName = DynamicNotchKit;
 		};
 		46A1EF232D2471EF00E83601 /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;

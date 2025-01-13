@@ -1,5 +1,7 @@
 import AppKit
 import Combine
+import DynamicNotchKit
+import SwiftUI
 
 class AccessibilityHelper {
     static let shared = AccessibilityHelper()
@@ -34,6 +36,12 @@ class AccessibilityHelper {
             if status {
                 self.checkTimer?.invalidate()
                 self.checkTimer = nil
+                let notch = DynamicNotchInfo(
+                    icon: Image(systemName: "accessibility.fill"),
+                    title: "辅助功能",
+                    description: "Dockit 辅助权限已获取"
+                )
+                notch.show(for: 3)
             }
         }
     }

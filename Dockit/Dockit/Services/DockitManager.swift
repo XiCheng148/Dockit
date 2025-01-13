@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import SwiftUI
 import Defaults
+import DynamicNotchKit
 
 class DockitManager: ObservableObject {
     static let shared = DockitManager()
@@ -94,6 +95,12 @@ class DockitManager: ObservableObject {
         guard let app = NSWorkspace.shared.frontmostApplication,
               let window = Windows.shared.inner.first(where: { $0.axWindow == axWindow }) else {
             DockitLogger.shared.logError("无法获取应用或窗口信息")
+            let dynamicNotch = DynamicNotchInfo (
+                icon: Image(systemName: "exclamationmark.triangle.fill"),
+                title: "无法获取前台窗口",
+                description: "请检查窗口是否有效"
+            )
+            dynamicNotch.show(for: 2)
             return
         }
         
@@ -105,6 +112,16 @@ class DockitManager: ObservableObject {
             edge: edge,
             frame: try? axWindow.frame()
         )
+
+        let dynamicNotch = DynamicNotchInfo (
+            icon: edge == .left ? 
+                Image(systemName: "arrowshape.left.fill") : 
+                Image(systemName: "arrowshape.right.fill"),
+            title: "\(try? axWindow.title())",
+            description: "已停靠到\(edge == .left ? "左" : "右")边"
+        )
+        dynamicNotch.show(for: 2)
+
         axWindow.dockTo(edge, exposedPixels: exposedPixels)
     }
     
@@ -136,6 +153,12 @@ class DockitManager: ObservableObject {
         
         // 先移除窗口，再停止监听
         dockedWindows.removeAll { $0.id == id }
+
+        let dynamicNotch = DynamicNotchInfo (
+            icon: Image(systemName: "checkmark.circle.fill"),
+            title: "\(try? window.axWindow.title()) 已取消停靠"
+        )
+        dynamicNotch.show(for: 2)
     }
     
     func undockAllWindows() {
@@ -143,6 +166,11 @@ class DockitManager: ObservableObject {
         // 先检查是不是空的
         if dockedWindows.isEmpty {
             DockitLogger.shared.logInfo("没有停靠的窗口")
+            let dynamicNotch = DynamicNotchInfo (
+                icon: Image(systemName: "exclamationmark.triangle.fill"),
+                title: "没有停靠的窗口"
+            )
+            dynamicNotch.show(for: 2)
             return
         }
         dockedWindows.forEach { window in
@@ -155,6 +183,11 @@ class DockitManager: ObservableObject {
             // try? window.axWindow.setSize(window.originalFrame.size)
         }
         dockedWindows.removeAll()
+        let dynamicNotch = DynamicNotchInfo (
+            icon: Image(systemName: "checkmark.circle.fill"),
+            title: "所有窗口已取消停靠"
+        )
+        dynamicNotch.show(for: 2)
     }
     
     private func setupEventMonitor() {

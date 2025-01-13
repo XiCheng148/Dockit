@@ -39,7 +39,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "rectangle.lefthalf.filled", accessibilityDescription: "Dockit")
+            button.image = NSImage(systemSymbolName: "inset.filled.trailinghalf.arrow.trailing.rectangle", accessibilityDescription: "Dockit")
             button.image?.size = NSSize(width: 18, height: 18)
         }
         statusItem?.menu = menu
