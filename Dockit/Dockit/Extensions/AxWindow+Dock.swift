@@ -52,10 +52,11 @@ extension AxWindow {
             // )
             // dynamicNotch.show(for: 3)
             NotchNotification.present(
+                leadingView: Rectangle().hidden().frame(width: 4),
                 bodyView: HStack(spacing: 16) {
                     Image(systemName: "xmark.circle.fill").font(.system(size: 28))
                     Text("停靠窗口失败").font(.system(size: 16))
-                },
+                }.frame(width: 220),
             interval: 2
         )
         }

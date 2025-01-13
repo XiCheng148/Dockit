@@ -44,10 +44,11 @@ class AccessibilityHelper {
                 // )
                 // notch.show(for: 3)
                 NotchNotification.present(
+                    leadingView: Rectangle().hidden().frame(width: 4),
                     bodyView: HStack(spacing: 16) {
                         Image(systemName: "accessibility.fill").font(.system(size: 28))
                         Text("辅助功能权限已获取").font(.system(size: 16))
-                    },
+                    }.frame(width: 220),
                     interval: 2
                 )
             }

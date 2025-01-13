@@ -103,10 +103,11 @@ class DockitManager: ObservableObject {
             // )
             // dynamicNotch.show(for: 2)
             NotchNotification.present(
+                leadingView: Rectangle().hidden().frame(width: 4),
                 bodyView: HStack(spacing: 16) {
                     Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28))
                     Text("无法获取前台窗口").font(.system(size: 16))
-                },
+                }.frame(width: 220),
                 interval: 2
             )
             return
@@ -123,10 +124,11 @@ class DockitManager: ObservableObject {
         let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
 
         NotchNotification.present(
+            leadingView: Rectangle().hidden().frame(width: 4),
             bodyView: HStack(spacing: 16) {
                 img.font(.system(size: 28))
                 Text("已停靠到\(edge == .left ? "左" : "右")边").font(.system(size: 16))
-            },
+            }.frame(width: 220),
             interval: 2
         )
 
@@ -177,10 +179,11 @@ class DockitManager: ObservableObject {
         // )
         // dynamicNotch.show(for: 2)
         NotchNotification.present(
+            leadingView: Rectangle().hidden().frame(width: 4),
             bodyView: HStack(spacing: 16) {
                 Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
                 Text("\(try? window.axWindow.title()) 已取消停靠").font(.system(size: 16))
-            },
+            }.frame(width: 220),
             interval: 2
         )
     }
@@ -196,10 +199,11 @@ class DockitManager: ObservableObject {
             // )
             // dynamicNotch.show(for: 2)
             NotchNotification.present(
+                leadingView: Rectangle().hidden().frame(width: 4),
                 bodyView: HStack(spacing: 16) {
                     Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28))
                     Text("没有停靠的窗口").font(.system(size: 16))
-                },
+                }.frame(width: 220),
                 interval: 2
             )
             return
@@ -220,10 +224,11 @@ class DockitManager: ObservableObject {
         // )
         // dynamicNotch.show(for: 2)
         NotchNotification.present(
+            leadingView: Rectangle().hidden().frame(width: 4),
             bodyView: HStack(spacing: 16) {
                 Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
                 Text("所有窗口已取消停靠").font(.system(size: 16))
-            },
+            }.frame(width: 220),
             interval: 2
         )
     }
