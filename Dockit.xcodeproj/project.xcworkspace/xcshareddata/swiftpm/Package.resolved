@@ -1,5 +1,5 @@
 {
-  "originHash" : "e872cb43d21816fbfa7336fa2e55e7ee4c30a3a7951b416ddd4f903e721203d8",
+  "originHash" : "cbd450736340b407c9f782b69c33c986d8b25fd5b8d6e0531daa937b4ae5b256",
   "pins" : [
     {
       "identity" : "defaults",
@@ -35,6 +35,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc"
+      }
+    },
+    {
+      "identity" : "notchnotification",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/NotchNotification.git",
+      "state" : {
+        "revision" : "e4d255d789eba108184b0aa1f6361a4adfb302f6",
+        "version" : "1.2.1"
       }
     },
     {

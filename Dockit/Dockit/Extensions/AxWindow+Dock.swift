@@ -1,7 +1,8 @@
 import AppKit
 import Foundation
 import SwiftUI
-import DynamicNotchKit
+// import DynamicNotchKit
+import NotchNotification
 
 extension AxWindow {
     func setPosition(_ position: CGPoint) throws {
@@ -44,12 +45,19 @@ extension AxWindow {
             DockitLogger.shared.logInfo("窗口已移动到目标位置：\(newFrame.origin)")
         } catch {
             DockitLogger.shared.logError("停靠窗口失败", error: error)
-            let dynamicNotch = DynamicNotchInfo (
-                icon: Image(systemName: "xmark.circle.fill"),
-                title: "停靠窗口失败",
-                description: "停靠窗口到\(edge == .left ? "左" : "右")边失败"
-            )
-            dynamicNotch.show(for: 3)
+            // let dynamicNotch = DynamicNotchInfo (
+            //     icon: Image(systemName: "xmark.circle.fill"),
+            //     title: "停靠窗口失败",
+            //     description: "停靠窗口到\(edge == .left ? "左" : "右")边失败"
+            // )
+            // dynamicNotch.show(for: 3)
+            NotchNotification.present(
+                bodyView: HStack(spacing: 16) {
+                    Image(systemName: "xmark.circle.fill").font(.system(size: 28))
+                    Text("停靠窗口失败").font(.system(size: 16))
+                },
+            interval: 2
+        )
         }
     }
     
