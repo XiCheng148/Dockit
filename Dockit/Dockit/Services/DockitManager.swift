@@ -138,7 +138,7 @@ class DockitManager: ObservableObject {
             leadingView: Rectangle().hidden().frame(width: 4),
             bodyView: HStack(spacing: 16) {
                 img.font(.system(size: 28))
-                Text("已停靠到\(edge == .left ? "左" : "右")边").font(.system(size: 16))
+                Text(((try? axWindow.title()) ?? "") + " 已停靠到\(edge == .left ? "左" : "右")边").font(.system(size: 16))
             }.frame(width: 220),
             interval: 2
         )
@@ -223,15 +223,15 @@ class DockitManager: ObservableObject {
             }
             
             if isLargelyOffscreen {
-                // 如果窗口大部分在屏幕外，将其移动到主屏幕中央
-                if let mainScreen = NSScreen.main {
+                // 如果窗口大部分在屏幕外，将其移动到当前屏幕或主屏幕中央
+                if let currentScreen = NSScreen.screens.first(where: { $0.frame.intersects(window.originalFrame) }) ?? NSScreen.main {
                     let screenCenter = CGPoint(
-                        x: mainScreen.frame.midX - (window.originalFrame.width / 2),
-                        y: mainScreen.frame.midY - (window.originalFrame.height / 2)
+                        x: currentScreen.frame.midX - (window.originalFrame.width / 2),
+                        y: currentScreen.frame.midY - (window.originalFrame.height / 2)
                     )
                     targetFrame.origin = screenCenter
                     
-                    DockitLogger.shared.logInfo("窗口 \(try? window.axWindow.title() ?? "") 原位置在屏幕外，已移至屏幕中央")
+                    DockitLogger.shared.logInfo("窗口 \(try? window.axWindow.title() ?? "") 原位置在屏幕外，已移至\(currentScreen == NSScreen.main ? "主" : "当前")屏幕中央")
                 }
             }
             
@@ -271,7 +271,7 @@ class DockitManager: ObservableObject {
                     leadingView: Rectangle().hidden().frame(width: 4),
                     bodyView: HStack(spacing: 16) {
                         Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                        Text("\(try? dockedWindow.axWindow.title()) 已取消停靠").font(.system(size: 16))
+                        Text(((try? dockedWindow.axWindow.title()) ?? "") + " 已取消停靠").font(.system(size: 16))
                     }.frame(width: 220),
                     interval: 2
                 )

@@ -39,7 +39,7 @@ struct DockedWindow: Identifiable {
                         leadingView: Rectangle().hidden().frame(width: 4),
                         bodyView: HStack(spacing: 16) {
                             Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                            Text("\(try? axWindow.title()) 已取消停靠").font(.system(size: 16))
+                            Text(((try? axWindow.title()) ?? "") + " 已取消停靠").font(.system(size: 16))
                         }.frame(width: 220),
                         interval: 2
                     )
@@ -67,8 +67,8 @@ struct DockedWindow: Identifiable {
                     let isNormalDockMovement: Bool
                     switch dockedWindow.edge {
                     case .left:
-                        isNormalDockMovement = currentFrame.origin.x == screen.frame.minX - currentFrame.width + manager.exposedPixels || 
-                                              currentFrame.origin.x == screen.frame.minX - currentFrame.width + manager.exposedPixels
+                        isNormalDockMovement = currentFrame.origin.x == screen.frame.minX || // 展开状态
+                                              currentFrame.origin.x == screen.frame.minX - currentFrame.width + manager.exposedPixels // 收起状态
                     case .right:
                         isNormalDockMovement = currentFrame.origin.x == screen.frame.maxX - currentFrame.width || 
                                               currentFrame.origin.x == screen.frame.maxX - manager.exposedPixels
@@ -85,7 +85,7 @@ struct DockedWindow: Identifiable {
                             leadingView: Rectangle().hidden().frame(width: 4),
                             bodyView: HStack(spacing: 16) {
                                 Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                                Text("\(try? axWindow.title()) 已取消停靠").font(.system(size: 16))
+                                Text(((try? axWindow.title()) ?? "") + " 已取消停靠").font(.system(size: 16))
                             }.frame(width: 220),
                             interval: 2
                         )

@@ -27,7 +27,7 @@ extension AxWindow {
 
     func dockTo(_ edge: DockEdge, exposedPixels: CGFloat) {
         guard let currentFrame = try? frame(),
-              let screen = NSScreen.main 
+              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) })
         else {
             DockitLogger.shared.logError("无法获取窗口或屏幕信息")
             return
@@ -80,5 +80,9 @@ extension AxWindow {
         }
         
         return newFrame
+    }
+
+    func safeTitle() -> String {
+        return (try? title()) ?? ""
     }
 } 
