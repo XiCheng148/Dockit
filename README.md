@@ -2,7 +2,7 @@
 
 Dockit is a macOS window management tool focused on quickly docking windows to the edge of the screen and quickly previewing windows.
 
-## 📸 预览
+## 📸 Preview
 
 <h6 align="center">
   <img src="./Resources/preview.gif" alt="Dockit Demo" style="border-radius: 4px;">
@@ -23,7 +23,7 @@ Dockit is a macOS window management tool focused on quickly docking windows to t
 - 🎛️ Flexible Configuration: Adjustable exposed width, trigger area, etc.
 - 🔌 Auto Start: Support auto-start on boot
 
-## 📖 使用指南
+## 📖 Usage
 
 1. Download 和 install Dockit
 2. Grant accessibility permissions 和 restart when running for the first time
@@ -32,7 +32,7 @@ Dockit is a macOS window management tool focused on quickly docking windows to t
    - Right Dock: `⌘ + ⇧ + →`
    - Undock: `⌘ + ⇧ + H`
 
-## 星标
+## ⭐ Star
 
 <a href="https://star-history.com/#XiCheng148/Dockit&Date">
  <picture>
@@ -42,11 +42,11 @@ Dockit is a macOS window management tool focused on quickly docking windows to t
  </picture>
 </a>
 
-## 📝 开源协议
+## 📝 License
 
 This project is open source under the [GNU General Public License v3.0](LICENSE).
 
-## 🙏 感谢
+## 🙏 Thanks
 
 - [Peninsula](https://github.com/Celve/Peninsula) - Window related specific implementation reference this project
 - [Awesome-Merge-Picture](https://github.com/XiCheng148/Awesome-Merge-Picture) - A tool to quickly create a preview image of a dark 和 light mode project.
