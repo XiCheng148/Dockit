@@ -4,26 +4,33 @@ Dockit is a macOS window management tool focused on quickly docking windows to t
 
 ## 📸 预览
 
-![Preview](./Resources/preview.gif)
-
-![Setting](./Resources/setting.jpg)
+<h6 align="center">
+  <img src="./Resources/preview.gif" alt="Dockit Demo" style="border-radius: 4px;">
+  <br />
+  <span style="color: #999">Dockit Demo</span>
+  <br /><br />
+  <img src="./Resources/setting.jpg" alt="setting" style="border-radius: 4px;">
+  <br />
+  <span style="color: #999">Setting</span>
+  <br /><br />
+</h6>
 
 ## 🚀 Feature
 
 - 🎯 Quick Dock: One-click docking windows to the left or right of the screen
-- 🔄 Smart Display: Automatically expand when hovering, and automatically retract when leaving
+- 🔄 Smart Display: Automatically expand when hovering, 和 automatically retract when leaving
 - ⌨️ Shortcut Support: Support custom shortcut operations
 - 🎛️ Flexible Configuration: Adjustable exposed width, trigger area, etc.
 - 🔌 Auto Start: Support auto-start on boot
 
 ## 📖 使用指南
 
-1. Download and install Dockit
-2. Grant accessibility permissions and restart when running for the first time
+1. Download 和 install Dockit
+2. Grant accessibility permissions 和 restart when running for the first time
 3. Use default shortcuts or customize in settings:
-   - Left Dock:   `⌘ + ⇧ + ←`
-   - Right Dock:  `⌘ + ⇧ + →`
-   - Undock:      `⌘ + ⇧ + H`
+   - Left Dock: `⌘ + ⇧ + ←`
+   - Right Dock: `⌘ + ⇧ + →`
+   - Undock: `⌘ + ⇧ + H`
 
 ## 星标
 
