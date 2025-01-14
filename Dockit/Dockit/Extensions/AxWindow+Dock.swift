@@ -68,13 +68,15 @@ extension AxWindow {
         screen: NSScreen,
         exposedPixels: CGFloat
     ) -> CGRect {
+        // 获取窗口所在屏幕
+        let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) ?? screen
         var newFrame = currentFrame
         
         switch edge {
         case .left:
-            newFrame.origin.x = -currentFrame.width + exposedPixels
+            newFrame.origin.x = screen.frame.minX - currentFrame.width + exposedPixels
         case .right:
-            newFrame.origin.x = screen.frame.width - exposedPixels
+            newFrame.origin.x = screen.frame.maxX - exposedPixels
         }
         
         return newFrame

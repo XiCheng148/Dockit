@@ -50,14 +50,14 @@ struct DockedWindow: Identifiable {
                 if let dockedWindow = manager.dockedWindows.first(where: { $0.axWindow == axWindow }),
                    dockedWindow.isVisible,
                    let currentFrame = try? axWindow.frame(),
-                   let screen = NSScreen.main {
+                   let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) {
                     // 计算停靠位置的 X 坐标
                     let dockedX: CGFloat
                     switch dockedWindow.edge {
                     case .left:
-                        dockedX = 0
+                        dockedX = screen.frame.minX
                     case .right:
-                        dockedX = screen.frame.width - currentFrame.width
+                        dockedX = screen.frame.maxX - currentFrame.width
                     }
                     
                     // 计算与停靠位置的距离
@@ -67,12 +67,11 @@ struct DockedWindow: Identifiable {
                     let isNormalDockMovement: Bool
                     switch dockedWindow.edge {
                     case .left:
-                        isNormalDockMovement = currentFrame.origin.x == 0 || 
-                                              currentFrame.origin.x == -currentFrame.width + manager.exposedPixels
+                        isNormalDockMovement = currentFrame.origin.x == screen.frame.minX - currentFrame.width + manager.exposedPixels || 
+                                              currentFrame.origin.x == screen.frame.minX - currentFrame.width + manager.exposedPixels
                     case .right:
-                        let screenWidth = screen.frame.width
-                        isNormalDockMovement = currentFrame.origin.x == screenWidth - currentFrame.width || 
-                                              currentFrame.origin.x == screenWidth - manager.exposedPixels
+                        isNormalDockMovement = currentFrame.origin.x == screen.frame.maxX - currentFrame.width || 
+                                              currentFrame.origin.x == screen.frame.maxX - manager.exposedPixels
                     }
                     
                     // 只有不是正常的停靠移动，且超过阈值时才取消停靠
@@ -118,24 +117,23 @@ struct DockedWindow: Identifiable {
     }
     
     var triggerArea: CGRect {
-        guard let screen = NSScreen.main,
-              let currentFrame = try? axWindow.frame() else { return .zero }
+        guard let currentFrame = try? axWindow.frame(),
+              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) else { return .zero }
         
         let width = DockitManager.shared.triggerAreaWidth
-        
         let y = screen.frame.height - (currentFrame.origin.y + currentFrame.height)
         
         switch edge {
         case .left:
             return CGRect(
-                x: 0,
+                x: screen.frame.minX,  // 使用当前屏幕的左边界
                 y: y,
                 width: width,
                 height: currentFrame.height
             )
         case .right:
             return CGRect(
-                x: screen.frame.width - width,
+                x: screen.frame.maxX - width,  // 使用当前屏幕的右边界
                 y: y,
                 width: width,
                 height: currentFrame.height
@@ -144,8 +142,8 @@ struct DockedWindow: Identifiable {
     }
     
     var windowArea: CGRect {
-        guard let screen = NSScreen.main,
-              let currentFrame = try? axWindow.frame() else { return .zero }
+        guard let currentFrame = try? axWindow.frame(),
+              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) else { return .zero }
         
         // 转换 Y 坐标到 Cocoa 坐标系
         let y = screen.frame.height - (currentFrame.origin.y + currentFrame.height)
