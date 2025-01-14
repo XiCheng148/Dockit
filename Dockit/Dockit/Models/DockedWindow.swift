@@ -1,5 +1,7 @@
 import AppKit
 import Foundation
+import SwiftUI
+import NotchNotification
 
 struct DockedWindow: Identifiable {
     let id: UUID
@@ -33,6 +35,14 @@ struct DockedWindow: Identifiable {
             case kAXUIElementDestroyedNotification:
                 // 窗口关闭时取消停靠
                 if let id = manager.dockedWindows.first(where: { $0.axWindow == axWindow })?.id {
+                    NotchNotification.present(
+                        leadingView: Rectangle().hidden().frame(width: 4),
+                        bodyView: HStack(spacing: 16) {
+                            Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
+                            Text("\(try? axWindow.title()) 已取消停靠").font(.system(size: 16))
+                        }.frame(width: 220),
+                        interval: 2
+                    )
                     manager.undockWindow(id, reason: .windowClosed)
                 }
                 
@@ -71,6 +81,14 @@ struct DockedWindow: Identifiable {
                             try? axWindow.title(),
                             distance: distance,
                             frame: try? axWindow.frame()
+                        )
+                        NotchNotification.present(
+                            leadingView: Rectangle().hidden().frame(width: 4),
+                            bodyView: HStack(spacing: 16) {
+                                Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
+                                Text("\(try? axWindow.title()) 已取消停靠").font(.system(size: 16))
+                            }.frame(width: 220),
+                            interval: 2
                         )
                         manager.undockWindow(dockedWindow.id, reason: .dragDistance)
                     }

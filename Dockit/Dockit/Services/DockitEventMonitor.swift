@@ -23,7 +23,6 @@ class DockitEventMonitor {
             let now = Date()
             if now.timeIntervalSince(self.lastExecutionTime) >= self.throttleInterval {
                 let location = NSEvent.mouseLocation
-                DockitLogger.shared.logInfo("鼠标位置: (\(Int(location.x)), \(Int(location.y)))")
                 self.onMouseMoved?(location)
                 self.lastExecutionTime = now
             }

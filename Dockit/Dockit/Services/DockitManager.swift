@@ -91,6 +91,17 @@ class DockitManager: ObservableObject {
             return
         }
         
+        // 检查窗口是否已经停靠
+        if let existingWindow = dockedWindows.first(where: { $0.axWindow == axWindow }) {
+            // 如果已停靠且边缘相同，则忽略
+            if existingWindow.edge == edge {
+                DockitLogger.shared.logInfo("窗口已经停靠在\(edge == .left ? "左" : "右")边")
+                return
+            }
+            // 如果已停靠但边缘不同，则先取消停靠
+            undockWindow(existingWindow.id)
+        }
+        
         setupEventMonitor()
         
         guard let app = NSWorkspace.shared.frontmostApplication,
@@ -172,57 +183,69 @@ class DockitManager: ObservableObject {
         
         // 先移除窗口，再停止监听
         dockedWindows.removeAll { $0.id == id }
-
-        // let dynamicNotch = DynamicNotchInfo (
-        //     icon: Image(systemName: "checkmark.circle.fill"),
-        //     title: "\(try? window.axWindow.title()) 已取消停靠"
-        // )
-        // dynamicNotch.show(for: 2)
-        NotchNotification.present(
-            leadingView: Rectangle().hidden().frame(width: 4),
-            bodyView: HStack(spacing: 16) {
-                Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                Text("\(try? window.axWindow.title()) 已取消停靠").font(.system(size: 16))
-            }.frame(width: 220),
-            interval: 2
-        )
     }
     
-    func undockAllWindows() {
+    func undockAllWindows(type: UndockAllWindowsType = .normal) {
         DockitLogger.shared.logUndockAllShortcut()
         // 先检查是不是空的
         if dockedWindows.isEmpty {
             DockitLogger.shared.logInfo("没有停靠的窗口")
-            // let dynamicNotch = DynamicNotchInfo (
-            //     icon: Image(systemName: "exclamationmark.triangle.fill"),
-            //     title: "没有停靠的窗口"
-            // )
-            // dynamicNotch.show(for: 2)
-            NotchNotification.present(
-                leadingView: Rectangle().hidden().frame(width: 4),
-                bodyView: HStack(spacing: 16) {
-                    Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28))
-                    Text("没有停靠的窗口").font(.system(size: 16))
-                }.frame(width: 220),
-                interval: 2
-            )
+            if type == .normal {
+                NotchNotification.present(
+                    leadingView: Rectangle().hidden().frame(width: 4),
+                    bodyView: HStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28))
+                        Text("没有停靠的窗口").font(.system(size: 16))
+                    }.frame(width: 220),
+                    interval: 2
+                )
+            }
             return
         }
+        
         dockedWindows.forEach { window in
             DockitLogger.shared.logWindowUndocked(
                 try? window.axWindow.title(),
                 reason: .userAction,
                 frame: window.originalFrame
             )
-            try? window.axWindow.setPosition(window.originalFrame.origin)
-            // try? window.axWindow.setSize(window.originalFrame.size)
+            
+            // 获取所有屏幕
+            let screens = NSScreen.screens
+            var targetFrame = window.originalFrame
+            
+            // 检查原始位置是否大部分在所有屏幕外
+            let isLargelyOffscreen = screens.allSatisfy { screen in
+                let intersection = screen.frame.intersection(window.originalFrame)
+                let visibleArea = intersection.width * intersection.height
+                let totalArea = window.originalFrame.width * window.originalFrame.height
+                return visibleArea / totalArea < 0.3 // 如果可见面积小于30%，认为是大部分在屏幕外
+            }
+            
+            if isLargelyOffscreen {
+                // 如果窗口大部分在屏幕外，将其移动到主屏幕中央
+                if let mainScreen = NSScreen.main {
+                    let screenCenter = CGPoint(
+                        x: mainScreen.frame.midX - (window.originalFrame.width / 2),
+                        y: mainScreen.frame.midY - (window.originalFrame.height / 2)
+                    )
+                    targetFrame.origin = screenCenter
+                    
+                    DockitLogger.shared.logInfo("窗口 \(try? window.axWindow.title() ?? "") 原位置在屏幕外，已移至屏幕中央")
+                }
+            }
+            
+            // 在设置位置前先focus窗口
+            if let windowToFocus = Windows.shared.inner.first(where: { $0.axWindow == window.axWindow }) {
+                windowToFocus.focus()
+                DockitLogger.shared.logInfo("已激活窗口 \(try? window.axWindow.title() ?? "")")
+            }
+            
+            try? window.axWindow.setPosition(targetFrame.origin)
         }
+        
         dockedWindows.removeAll()
-        // let dynamicNotch = DynamicNotchInfo (
-        //     icon: Image(systemName: "checkmark.circle.fill"),
-        //     title: "所有窗口已取消停靠"
-        // )
-        // dynamicNotch.show(for: 2)
+        
         NotchNotification.present(
             leadingView: Rectangle().hidden().frame(width: 4),
             bodyView: HStack(spacing: 16) {
@@ -244,6 +267,14 @@ class DockitManager: ObservableObject {
             // 如果无法获取窗口框架，说明窗口可能已经关闭
             guard let _ = try? dockedWindow.axWindow.frame() else {
                 undockWindow(dockedWindow.id, reason: .windowClosed)
+                NotchNotification.present(
+                    leadingView: Rectangle().hidden().frame(width: 4),
+                    bodyView: HStack(spacing: 16) {
+                        Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
+                        Text("\(try? dockedWindow.axWindow.title()) 已取消停靠").font(.system(size: 16))
+                    }.frame(width: 220),
+                    interval: 2
+                )
                 return
             }
             

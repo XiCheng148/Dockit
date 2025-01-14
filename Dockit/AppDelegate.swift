@@ -2,6 +2,7 @@ import AppKit
 import Cocoa
 import LaunchAtLogin
 import SwiftUI
+import NotchNotification
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var isFirstOpen = true
@@ -35,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         menu.addItem(NSMenuItem(title: "设置", action: #selector(openSettings), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "退出", action: #selector(NSApplication.terminate(_:)), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "退出", action: #selector(quit), keyEquivalent: ""))
         
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
@@ -72,6 +73,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.makeKey()
         }
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc private func quit() {
+        // 先取消所有窗口停靠
+        DockitManager.shared.undockAllWindows(type: .quit)
+
+        NotchNotification.present(
+            leadingView: Rectangle().hidden().frame(width: 4),
+            bodyView: HStack(spacing: 16) {
+                Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
+                Text("退出前清理停靠窗口").font(.system(size: 16))
+            }.frame(width: 220)
+        )
+        
+        // 延迟一小段时间后退出应用,确保取消停靠动作完成
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            NSApplication.shared.terminate(nil)
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

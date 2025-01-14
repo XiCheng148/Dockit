@@ -98,3 +98,8 @@ enum UndockReason {
     case windowClosed // 窗口关闭
     case dragDistance // 拖拽距离超过阈值
 } 
+
+enum UndockAllWindowsType {
+    case normal // 正常取消
+    case quit // 退出前取消
+}
