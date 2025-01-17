@@ -81,10 +81,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         NotchNotification.present(
             leadingView: Rectangle().hidden().frame(width: 4),
-            bodyView: HStack(spacing: 16) {
-                Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                Text("退出前清理停靠窗口").font(.system(size: 16))
-            }.frame(width: 220)
+            bodyView: HStack() {
+                Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("退出前清理停靠窗口").lineLimit(1).font(.system(size: 14)).bold()
+                }
+            },
+            interval: 2
         )
         
         // 延迟一小段时间后退出应用,确保取消停靠动作完成

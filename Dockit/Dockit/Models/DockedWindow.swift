@@ -37,10 +37,12 @@ struct DockedWindow: Identifiable {
                 if let id = manager.dockedWindows.first(where: { $0.axWindow == axWindow })?.id {
                     NotchNotification.present(
                         leadingView: Rectangle().hidden().frame(width: 4),
-                        bodyView: HStack(spacing: 16) {
-                            Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                            Text(((try? axWindow.title()) ?? "") + " 已取消停靠").font(.system(size: 16))
-                        }.frame(width: 220),
+                        bodyView: HStack() {
+                            Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(((try? axWindow.title()) ?? "") + " 已取消停靠").lineLimit(1).font(.system(size: 14)).bold()
+                            }
+                        },
                         interval: 2
                     )
                     manager.undockWindow(id, reason: .windowClosed)
@@ -83,10 +85,13 @@ struct DockedWindow: Identifiable {
                         )
                         NotchNotification.present(
                             leadingView: Rectangle().hidden().frame(width: 4),
-                            bodyView: HStack(spacing: 16) {
-                                Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                                Text(((try? axWindow.title()) ?? "") + " 已取消停靠").font(.system(size: 16))
-                            }.frame(width: 220),
+                            bodyView: HStack() {
+                                Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(((try? axWindow.title()) ?? "")).lineLimit(1).font(.system(size: 14)).bold()
+                                    Text("已取消停靠").font(.system(size: 12))
+                                }
+                            },
                             interval: 2
                         )
                         manager.undockWindow(dockedWindow.id, reason: .dragDistance)
@@ -121,19 +126,21 @@ struct DockedWindow: Identifiable {
               let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) else { return .zero }
         
         let width = DockitManager.shared.triggerAreaWidth
-        let y = screen.frame.height - (currentFrame.origin.y + currentFrame.height)
+        
+        // 将窗口坐标转换为相对于当前屏幕的 Cocoa 坐标系
+        let y = screen.frame.maxY - currentFrame.maxY
         
         switch edge {
         case .left:
             return CGRect(
-                x: screen.frame.minX,  // 使用当前屏幕的左边界
+                x: screen.frame.minX,
                 y: y,
                 width: width,
                 height: currentFrame.height
             )
         case .right:
             return CGRect(
-                x: screen.frame.maxX - width,  // 使用当前屏幕的右边界
+                x: screen.frame.maxX - width,
                 y: y,
                 width: width,
                 height: currentFrame.height
@@ -145,8 +152,8 @@ struct DockedWindow: Identifiable {
         guard let currentFrame = try? axWindow.frame(),
               let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) else { return .zero }
         
-        // 转换 Y 坐标到 Cocoa 坐标系
-        let y = screen.frame.height - (currentFrame.origin.y + currentFrame.height)
+        // 将窗口坐标转换为相对于当前屏幕的 Cocoa 坐标系
+        let y = screen.frame.maxY - currentFrame.maxY
         
         return CGRect(
             x: currentFrame.origin.x,

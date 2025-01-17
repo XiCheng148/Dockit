@@ -1,5 +1,5 @@
 {
-  "originHash" : "cbd450736340b407c9f782b69c33c986d8b25fd5b8d6e0531daa937b4ae5b256",
+  "originHash" : "1892760836d4edf5b0a59f246a064a4fc12247d60659581110a6328d972e2fc4",
   "pins" : [
     {
       "identity" : "defaults",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "ef1b2318fb549002bb533bec3a8ad98ae09f2cb6",
         "version" : "9.0.0"
-      }
-    },
-    {
-      "identity" : "dynamicnotchkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/MrKai77/DynamicNotchKit",
-      "state" : {
-        "branch" : "main",
-        "revision" : "0f2213c671585db887f53e86812134a7a6cc74e5"
       }
     },
     {
@@ -44,6 +35,15 @@
       "state" : {
         "revision" : "e4d255d789eba108184b0aa1f6361a4adfb302f6",
         "version" : "1.2.1"
+      }
+    },
+    {
+      "identity" : "pow",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/EmergeTools/Pow",
+      "state" : {
+        "revision" : "a504eb6d144bcf49f4f33029a2795345cb39e6b4",
+        "version" : "1.0.5"
       }
     },
     {

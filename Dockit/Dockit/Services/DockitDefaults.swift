@@ -7,4 +7,5 @@ extension Defaults.Keys {
     static let fps = Key<Int>("fps", default: 30)
     static let isEnabled = Key<Bool>("isEnabled", default: true)
     static let respectSpaces = Key<Bool>("respectSpaces", default: true)
+    static let screenWithMouse = Key<Bool>("screenWithMouse", default: false)
 } 

@@ -115,10 +115,12 @@ class DockitManager: ObservableObject {
             // dynamicNotch.show(for: 2)
             NotchNotification.present(
                 leadingView: Rectangle().hidden().frame(width: 4),
-                bodyView: HStack(spacing: 16) {
-                    Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28))
-                    Text("无法获取前台窗口").font(.system(size: 16))
-                }.frame(width: 220),
+                bodyView: HStack() {
+                    Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("无法获取前台窗口").lineLimit(1).font(.system(size: 14)).bold()
+                    }
+                },
                 interval: 2
             )
             return
@@ -132,14 +134,18 @@ class DockitManager: ObservableObject {
             edge: edge,
             frame: try? axWindow.frame()
         )
+        // let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
         let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
-
+        
         NotchNotification.present(
             leadingView: Rectangle().hidden().frame(width: 4),
-            bodyView: HStack(spacing: 16) {
-                img.font(.system(size: 28))
-                Text(((try? axWindow.title()) ?? "") + " 已停靠到\(edge == .left ? "左" : "右")边").font(.system(size: 16))
-            }.frame(width: 220),
+            bodyView: HStack{
+                img.font(.system(size: 28)).padding(.trailing, 16)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text((try? axWindow.title()) ?? "").lineLimit(1).font(.system(size: 14)).bold()
+                    Text("已停靠到\(edge == .left ? "左" : "右")边").font(.system(size: 12))
+                }
+            },
             interval: 2
         )
 
@@ -193,10 +199,12 @@ class DockitManager: ObservableObject {
             if type == .normal {
                 NotchNotification.present(
                     leadingView: Rectangle().hidden().frame(width: 4),
-                    bodyView: HStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28))
-                        Text("没有停靠的窗口").font(.system(size: 16))
-                    }.frame(width: 220),
+                    bodyView: HStack() {
+                        Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("没有停靠的窗口").lineLimit(1).font(.system(size: 14)).bold()
+                        }
+                    },
                     interval: 2
                 )
             }
@@ -248,10 +256,12 @@ class DockitManager: ObservableObject {
         
         NotchNotification.present(
             leadingView: Rectangle().hidden().frame(width: 4),
-            bodyView: HStack(spacing: 16) {
-                Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                Text("所有窗口已取消停靠").font(.system(size: 16))
-            }.frame(width: 220),
+            bodyView: HStack {
+                Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("取消停已靠所有窗口").font(.system(size: 14)).bold().lineLimit(1).minimumScaleFactor(0.5)
+                }
+            },
             interval: 2
         )
     }
@@ -269,10 +279,13 @@ class DockitManager: ObservableObject {
                 undockWindow(dockedWindow.id, reason: .windowClosed)
                 NotchNotification.present(
                     leadingView: Rectangle().hidden().frame(width: 4),
-                    bodyView: HStack(spacing: 16) {
-                        Image(systemName: "checkmark.circle.fill").font(.system(size: 28))
-                        Text(((try? dockedWindow.axWindow.title()) ?? "") + " 已取消停靠").font(.system(size: 16))
-                    }.frame(width: 220),
+                    bodyView: HStack() {
+                        Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(((try? dockedWindow.axWindow.title()) ?? "")).lineLimit(1).font(.system(size: 14)).bold()
+                            Text("已取消停靠").font(.system(size: 12))
+                        }
+                    },
                     interval: 2
                 )
                 return

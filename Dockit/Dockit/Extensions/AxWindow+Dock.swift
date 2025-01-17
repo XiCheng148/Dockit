@@ -53,10 +53,12 @@ extension AxWindow {
             // dynamicNotch.show(for: 3)
             NotchNotification.present(
                 leadingView: Rectangle().hidden().frame(width: 4),
-                bodyView: HStack(spacing: 16) {
-                    Image(systemName: "xmark.circle.fill").font(.system(size: 28))
-                    Text("停靠窗口失败").font(.system(size: 16))
-                }.frame(width: 220),
+                bodyView: HStack() {
+                    Image(systemName: "xmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("停靠窗口失败").lineLimit(1).font(.system(size: 14)).bold()
+                    }
+                },
             interval: 2
         )
         }
