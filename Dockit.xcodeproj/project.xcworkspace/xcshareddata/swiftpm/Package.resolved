@@ -1,6 +1,24 @@
 {
-  "originHash" : "1892760836d4edf5b0a59f246a064a4fc12247d60659581110a6328d972e2fc4",
+  "originHash" : "be05b04cf2a02f153c0c2fc640bfaccca2dbbe3116641a69d8121cd394d47faf",
   "pins" : [
+    {
+      "identity" : "colorfulx",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/ColorfulX.git",
+      "state" : {
+        "revision" : "424740ff16b9e1a82d0508137538652edf966605",
+        "version" : "5.5.5"
+      }
+    },
+    {
+      "identity" : "colorvector",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/ColorVector.git",
+      "state" : {
+        "revision" : "031ce6ce65c0b347fb192302aa8ec4a17cc1494f",
+        "version" : "1.0.3"
+      }
+    },
     {
       "identity" : "defaults",
       "kind" : "remoteSourceControl",
@@ -29,6 +47,15 @@
       }
     },
     {
+      "identity" : "msdisplaylink",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/MSDisplayLink.git",
+      "state" : {
+        "revision" : "efbc0188b207ca44e043aa2bcbdba0309fc2f54b",
+        "version" : "2.0.5"
+      }
+    },
+    {
       "identity" : "notchnotification",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/NotchNotification.git",
@@ -44,6 +71,15 @@
       "state" : {
         "revision" : "a504eb6d144bcf49f4f33029a2795345cb39e6b4",
         "version" : "1.0.5"
+      }
+    },
+    {
+      "identity" : "springinterpolation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/SpringInterpolation.git",
+      "state" : {
+        "revision" : "f9d1ee3d2466bdb00fd0ade7f256ed20229c8413",
+        "version" : "1.3.0"
       }
     },
     {

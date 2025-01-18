@@ -45,26 +45,10 @@ extension AxWindow {
             DockitLogger.shared.logInfo("窗口已移动到目标位置：\(newFrame.origin)")
         } catch {
             DockitLogger.shared.logError("停靠窗口失败", error: error)
-            // let dynamicNotch = DynamicNotchInfo (
-            //     icon: Image(systemName: "xmark.circle.fill"),
-            //     title: "停靠窗口失败",
-            //     description: "停靠窗口到\(edge == .left ? "左" : "右")边失败"
-            // )
-            // dynamicNotch.show(for: 3)
-            NotchNotification.present(
-                leadingView: Rectangle().hidden().frame(width: 4),
-                bodyView: HStack() {
-                    Image(systemName: "xmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                    HStack {
-                        Spacer()
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("停靠窗口失败").font(.system(size: 14)).bold()
-                        }
-                        Spacer()
-                    }
-                },
-            interval: 2
-        )
+            NotificationHelper.show(
+                type: .error,
+                title: "停靠窗口失败"
+            )
         }
     }
     

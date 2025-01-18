@@ -107,25 +107,9 @@ class DockitManager: ObservableObject {
         guard let app = NSWorkspace.shared.frontmostApplication,
               let window = Windows.shared.inner.first(where: { $0.axWindow == axWindow }) else {
             DockitLogger.shared.logError("无法获取应用或窗口信息")
-            // let dynamicNotch = DynamicNotchInfo (
-            //     icon: Image(systemName: "exclamationmark.triangle.fill"),
-            //     title: "无法获取前台窗口",
-            //     description: "请检查窗口是否有效"
-            // )
-            // dynamicNotch.show(for: 2)
-            NotchNotification.present(
-                leadingView: Rectangle().hidden().frame(width: 4),
-                bodyView: HStack() {
-                    Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                    HStack {
-                        Spacer()
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("无法获取前台窗口").font(.system(size: 14)).bold()
-                        }
-                        Spacer()
-                    }
-                },
-                interval: 2
+            NotificationHelper.show(
+                type: .warning,
+                title: "无法获取前台窗口"
             )
             return
         }
@@ -141,22 +125,10 @@ class DockitManager: ObservableObject {
         // let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
         let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
         
-        NotchNotification.present(
-            leadingView: Rectangle().hidden().frame(width: 4),
-            bodyView: HStack() {
-                img.font(.system(size: 28)).padding(.trailing, 16)
-                HStack {
-                    Spacer()
-                    VStack(alignment: .leading, spacing: 4) {
-                        if let title = try? axWindow.title() {
-                            Text(title).font(.system(size: 14)).bold()
-                        }
-                        Text("已停靠到\(edge == .left ? "左" : "右")边").font(.system(size: 12))
-                    }
-                    Spacer()
-                }
-            },
-            interval: 2
+        NotificationHelper.show(
+            type: .custom(edge == .left ? "arrowshape.left.fill" : "arrowshape.right.fill"),
+            title: try! axWindow.title() ?? "",
+            description: "已停靠到\(edge == .left ? "左" : "右")边"
         )
 
         // let dynamicNotch = DynamicNotchInfo (
@@ -199,6 +171,12 @@ class DockitManager: ObservableObject {
         
         // 先移除窗口，再停止监听
         dockedWindows.removeAll { $0.id == id }
+        
+        NotificationHelper.show(
+            type: .success,
+            title: try! window.axWindow.title() ?? "",
+            description: "已取消停靠"
+        )
     }
     
     func undockAllWindows(type: UndockAllWindowsType = .normal) {
@@ -207,19 +185,9 @@ class DockitManager: ObservableObject {
         if dockedWindows.isEmpty {
             DockitLogger.shared.logInfo("没有停靠的窗口")
             if type == .normal {
-                NotchNotification.present(
-                    leadingView: Rectangle().hidden().frame(width: 4),
-                    bodyView: HStack() {
-                        Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                        HStack {
-                            Spacer()
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("没有停靠的窗口").font(.system(size: 14)).bold()
-                            }
-                            Spacer()
-                        }
-                    },
-                    interval: 2
+                NotificationHelper.show(
+                    type: .warning,
+                    title: "没有停靠的窗口"
                 )
             }
             return
@@ -268,19 +236,9 @@ class DockitManager: ObservableObject {
         
         dockedWindows.removeAll()
         
-        NotchNotification.present(
-            leadingView: Rectangle().hidden().frame(width: 4),
-            bodyView: HStack {
-                Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                HStack {
-                    Spacer()
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("取消停已靠所有窗口").font(.system(size: 14)).bold().minimumScaleFactor(0.5)
-                    }
-                    Spacer()
-                }
-            },
-            interval: 2
+        NotificationHelper.show(
+            type: .success,
+            title: "取消停已靠所有窗口"
         )
     }
     
@@ -295,22 +253,10 @@ class DockitManager: ObservableObject {
             // 如果无法获取窗口框架，说明窗口可能已经关闭
             guard let _ = try? dockedWindow.axWindow.frame() else {
                 undockWindow(dockedWindow.id, reason: .windowClosed)
-                NotchNotification.present(
-                    leadingView: Rectangle().hidden().frame(width: 4),
-                    bodyView: HStack() {
-                        Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                        HStack {
-                            Spacer()
-                            VStack(alignment: .leading, spacing: 4) {
-                                if let title = try? dockedWindow.axWindow.title() {
-                                    Text(title).font(.system(size: 14)).bold()
-                                }
-                                Text("已取消停靠").font(.system(size: 12))
-                            }
-                            Spacer()
-                        }
-                    },
-                    interval: 2
+                NotificationHelper.show(
+                    type: .success,
+                    title: try! dockedWindow.axWindow.title() ?? "",
+                    description: "已取消停靠"
                 )
                 return
             }

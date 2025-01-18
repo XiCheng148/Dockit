@@ -35,22 +35,10 @@ struct DockedWindow: Identifiable {
             case kAXUIElementDestroyedNotification:
                 // 窗口关闭时取消停靠
                 if let id = manager.dockedWindows.first(where: { $0.axWindow == axWindow })?.id {
-                    NotchNotification.present(
-                        leadingView: Rectangle().hidden().frame(width: 4),
-                        bodyView: HStack() {
-                            Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                            HStack {
-                                Spacer()
-                                VStack(alignment: .leading, spacing: 4) {
-                                    if let title = try? axWindow.title() {
-                                        Text(title).font(.system(size: 14)).bold()
-                                    }
-                                    Text("已取消停靠").font(.system(size: 12))
-                                }
-                                Spacer()
-                            }
-                        },
-                        interval: 2
+                    NotificationHelper.show(
+                        type: .success,
+                        title: try! axWindow.title() ?? "",
+                        description: "已取消停靠"
                     )
                     manager.undockWindow(id, reason: .windowClosed)
                 }
@@ -90,22 +78,10 @@ struct DockedWindow: Identifiable {
                             distance: distance,
                             frame: try? axWindow.frame()
                         )
-                        NotchNotification.present(
-                            leadingView: Rectangle().hidden().frame(width: 4),
-                            bodyView: HStack() {
-                                Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                                HStack {
-                                    Spacer()
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        if let title = try? axWindow.title() {
-                                            Text(title).font(.system(size: 14)).bold()
-                                        }
-                                        Text("已取消停靠").font(.system(size: 12))
-                                    }
-                                    Spacer()
-                                }
-                            },
-                            interval: 2
+                        NotificationHelper.show(
+                            type: .success,
+                            title: try! axWindow.title() ?? "",
+                            description: "已取消停靠"
                         )
                         manager.undockWindow(dockedWindow.id, reason: .dragDistance)
                     }

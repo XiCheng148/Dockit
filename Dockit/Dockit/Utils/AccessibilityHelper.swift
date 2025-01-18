@@ -37,25 +37,9 @@ class AccessibilityHelper {
             if status {
                 self.checkTimer?.invalidate()
                 self.checkTimer = nil
-                // let notch = DynamicNotchInfo(
-                //     icon: Image(systemName: "accessibility.fill"),
-                //     title: "辅助功能",
-                //     description: "Dockit 辅助权限已获取"
-                // )
-                // notch.show(for: 3)
-                NotchNotification.present(
-                    leadingView: Rectangle().hidden().frame(width: 4),
-                    bodyView: HStack() {
-                        Image(systemName: "accessibility.fill").font(.system(size: 28)).padding(.trailing, 16)
-                        HStack {
-                            Spacer()
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("辅助功能权限已获取").font(.system(size: 14)).bold()
-                            }
-                            Spacer()
-                        }
-                    },
-                    interval: 2
+                NotificationHelper.show(
+                    type: .success,
+                    title: "辅助功能权限已获取"
                 )
             }
         }

@@ -79,19 +79,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 先取消所有窗口停靠
         DockitManager.shared.undockAllWindows(type: .quit)
 
-        NotchNotification.present(
-            leadingView: Rectangle().hidden().frame(width: 4),
-            bodyView: HStack() {
-                Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                HStack {
-                    Spacer()
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("退出前清理停靠窗口").font(.system(size: 14)).bold()
-                    }
-                    Spacer()
-                }
-            },
-            interval: 2
+        NotificationHelper.show(
+            type: .success,
+            title: "退出前清理停靠窗口"
         )
         
         // 延迟一小段时间后退出应用,确保取消停靠动作完成

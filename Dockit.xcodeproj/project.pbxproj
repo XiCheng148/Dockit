@@ -12,6 +12,7 @@
 		462614822D351336006CBF81 /* NotchNotification in Frameworks */ = {isa = PBXBuildFile; productRef = 462614812D351336006CBF81 /* NotchNotification */; };
 		46A1EF242D2471EF00E83601 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF232D2471EF00E83601 /* Defaults */; };
 		46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF252D2471EF00E83601 /* DefaultsMacros */; };
+		46BFE1812D3C009B005CD02C /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 46BFE1802D3C009B005CD02C /* ColorfulX */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
 		64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64EBAF942CFECF7E000429A4 /* SkyLight.framework */; };
 /* End PBXBuildFile section */
@@ -41,6 +42,7 @@
 				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
 				64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */,
 				462614822D351336006CBF81 /* NotchNotification in Frameworks */,
+				46BFE1812D3C009B005CD02C /* ColorfulX in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +100,7 @@
 				46A1EF252D2471EF00E83601 /* DefaultsMacros */,
 				462614812D351336006CBF81 /* NotchNotification */,
 				460DFB2E2D3A5C00001122D9 /* Pow */,
+				46BFE1802D3C009B005CD02C /* ColorfulX */,
 			);
 			productName = Dockit;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Dockit.app */;
@@ -133,6 +136,7 @@
 				46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */,
 				462614802D351336006CBF81 /* XCRemoteSwiftPackageReference "NotchNotification" */,
 				460DFB2D2D3A5C00001122D9 /* XCRemoteSwiftPackageReference "Pow" */,
+				46BFE17F2D3C009B005CD02C /* XCRemoteSwiftPackageReference "ColorfulX" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -407,6 +411,14 @@
 				minimumVersion = 9.0.0;
 			};
 		};
+		46BFE17F2D3C009B005CD02C /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Lakr233/ColorfulX";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.5;
+			};
+		};
 		64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
@@ -442,6 +454,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = DefaultsMacros;
+		};
+		46BFE1802D3C009B005CD02C /* ColorfulX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 46BFE17F2D3C009B005CD02C /* XCRemoteSwiftPackageReference "ColorfulX" */;
+			productName = ColorfulX;
 		};
 		64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
