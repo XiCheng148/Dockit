@@ -55,8 +55,12 @@ extension AxWindow {
                 leadingView: Rectangle().hidden().frame(width: 4),
                 bodyView: HStack() {
                     Image(systemName: "xmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("停靠窗口失败").lineLimit(1).font(.system(size: 14)).bold()
+                    HStack {
+                        Spacer()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("停靠窗口失败").font(.system(size: 14)).bold()
+                        }
+                        Spacer()
                     }
                 },
             interval: 2

@@ -83,8 +83,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             leadingView: Rectangle().hidden().frame(width: 4),
             bodyView: HStack() {
                 Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("退出前清理停靠窗口").lineLimit(1).font(.system(size: 14)).bold()
+                HStack {
+                    Spacer()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("退出前清理停靠窗口").font(.system(size: 14)).bold()
+                    }
+                    Spacer()
                 }
             },
             interval: 2

@@ -39,8 +39,15 @@ struct DockedWindow: Identifiable {
                         leadingView: Rectangle().hidden().frame(width: 4),
                         bodyView: HStack() {
                             Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(((try? axWindow.title()) ?? "") + " 已取消停靠").lineLimit(1).font(.system(size: 14)).bold()
+                            HStack {
+                                Spacer()
+                                VStack(alignment: .leading, spacing: 4) {
+                                    if let title = try? axWindow.title() {
+                                        Text(title).font(.system(size: 14)).bold()
+                                    }
+                                    Text("已取消停靠").font(.system(size: 12))
+                                }
+                                Spacer()
                             }
                         },
                         interval: 2
@@ -87,9 +94,15 @@ struct DockedWindow: Identifiable {
                             leadingView: Rectangle().hidden().frame(width: 4),
                             bodyView: HStack() {
                                 Image(systemName: "checkmark.circle.fill").font(.system(size: 28)).padding(.trailing, 16)
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(((try? axWindow.title()) ?? "")).lineLimit(1).font(.system(size: 14)).bold()
-                                    Text("已取消停靠").font(.system(size: 12))
+                                HStack {
+                                    Spacer()
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        if let title = try? axWindow.title() {
+                                            Text(title).font(.system(size: 14)).bold()
+                                        }
+                                        Text("已取消停靠").font(.system(size: 12))
+                                    }
+                                    Spacer()
                                 }
                             },
                             interval: 2
