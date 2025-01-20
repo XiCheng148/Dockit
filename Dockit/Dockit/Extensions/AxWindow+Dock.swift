@@ -58,21 +58,26 @@ extension AxWindow {
         screen: NSScreen,
         exposedPixels: CGFloat
     ) -> CGRect {
-        // 获取窗口所在屏幕
-        let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) ?? screen
+        let coordinator = GlobalCoordinateSystem.shared
+        let targetScreen = coordinator.getScreen(for: currentFrame) ?? screen
         var newFrame = currentFrame
+        
+        // 将窗口坐标转换为全局坐标
+        let globalFrame = coordinator.calculateGlobalFrame(currentFrame, for: targetScreen)
         
         switch edge {
         case .left:
-            newFrame.origin.x = screen.frame.minX - currentFrame.width + exposedPixels
+            newFrame.origin.x = targetScreen.frame.minX - currentFrame.width + exposedPixels
         case .right:
-            newFrame.origin.x = screen.frame.maxX - exposedPixels
+            newFrame.origin.x = targetScreen.frame.maxX - exposedPixels
         }
         
-        return newFrame
+        // 将新位置转换回本地坐标
+        let localFrame = coordinator.calculateLocalFrame(newFrame, for: targetScreen)
+        return localFrame
     }
 
     func safeTitle() -> String {
         return (try? title()) ?? ""
     }
-} 
+}

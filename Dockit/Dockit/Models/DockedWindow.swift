@@ -46,15 +46,18 @@ struct DockedWindow: Identifiable {
             case kAXWindowMovedNotification:
                 if let dockedWindow = manager.dockedWindows.first(where: { $0.axWindow == axWindow }),
                    dockedWindow.isVisible,
-                   let currentFrame = try? axWindow.frame(),
-                   let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) {
-                    // 计算停靠位置的 X 坐标
+                   let currentFrame = try? axWindow.frame() {
+                    let coordinator = GlobalCoordinateSystem.shared
+                    let targetScreen = coordinator.getScreen(for: currentFrame) ?? NSScreen.main!
+                    
+                    // 计算停靠位置的 X 坐标（在全局坐标系中）
+                    let globalFrame = coordinator.calculateGlobalFrame(currentFrame, for: targetScreen)
                     let dockedX: CGFloat
                     switch dockedWindow.edge {
                     case .left:
-                        dockedX = screen.frame.minX
+                        dockedX = targetScreen.frame.minX
                     case .right:
-                        dockedX = screen.frame.maxX - currentFrame.width
+                        dockedX = targetScreen.frame.maxX - currentFrame.width
                     }
                     
                     // 计算与停靠位置的距离
@@ -64,11 +67,11 @@ struct DockedWindow: Identifiable {
                     let isNormalDockMovement: Bool
                     switch dockedWindow.edge {
                     case .left:
-                        isNormalDockMovement = currentFrame.origin.x == screen.frame.minX || // 展开状态
-                                              currentFrame.origin.x == screen.frame.minX - currentFrame.width + manager.exposedPixels // 收起状态
+                        isNormalDockMovement = currentFrame.origin.x == targetScreen.frame.minX || // 展开状态
+                                              currentFrame.origin.x == targetScreen.frame.minX - currentFrame.width + manager.exposedPixels // 收起状态
                     case .right:
-                        isNormalDockMovement = currentFrame.origin.x == screen.frame.maxX - currentFrame.width || 
-                                              currentFrame.origin.x == screen.frame.maxX - manager.exposedPixels
+                        isNormalDockMovement = currentFrame.origin.x == targetScreen.frame.maxX - currentFrame.width || 
+                                              currentFrame.origin.x == targetScreen.frame.maxX - manager.exposedPixels
                     }
                     
                     // 只有不是正常的停靠移动，且超过阈值时才取消停靠
@@ -151,4 +154,4 @@ struct DockedWindow: Identifiable {
             height: currentFrame.height
         )
     }
-} 
+}
