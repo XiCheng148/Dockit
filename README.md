@@ -7,11 +7,11 @@ Dockit is a macOS window management tool focused on quickly docking windows to t
 <h6 align="center">
   <img src="./Resources/preview.gif" alt="Dockit Demo" style="border-radius: 4px;">
   <br />
-  <span style="color: #999">Dockit Demo</span>
+  <span style="color: #999">Dockit Demo.gif</span>
   <br /><br />
   <img src="./Resources/setting.jpg" alt="setting" style="border-radius: 4px;">
   <br />
-  <span style="color: #999">Setting</span>
+  <span style="color: #999">Setting.png</span>
   <br /><br />
 </h6>
 
