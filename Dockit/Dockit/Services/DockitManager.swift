@@ -75,6 +75,8 @@ class DockitManager: ObservableObject {
     
     private let eventMonitor = DockitEventMonitor()
     
+    private var workspaceNotificationObserver: NSObjectProtocol?
+    
     private init() {
         self._exposedPixels = Double(Defaults[.exposedPixels])
         self._triggerAreaWidth = Double(Defaults[.triggerAreaWidth])
@@ -83,6 +85,15 @@ class DockitManager: ObservableObject {
         self._fps = Double(Defaults[.fps])
         
         DockitLogger.shared.logInfo("DockitManager 初始化 - 露出像素: \(exposedPixels)px, 触发区域宽度: \(triggerAreaWidth)px")
+        
+        // 添加工作区切换监听
+        workspaceNotificationObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.activeSpaceDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleSpaceChange()
+        }
     }
     
     func dockWindow(_ axWindow: AxWindow, to edge: DockEdge) {
@@ -360,5 +371,33 @@ class DockitManager: ObservableObject {
         }
         
         dockWindow(window, to: edge)
+    }
+    
+    private func handleSpaceChange() {
+        // 遍历所有已停靠的窗口
+        dockedWindows.forEach { dockedWindow in
+            // 如果窗口当前是展开状态
+            if dockedWindow.isVisible {
+                // 检查窗口是否在当前空间可见
+                let isVisible = isWindowVisibleOnScreen(dockedWindow.axWindow)
+                if !isVisible {
+                    // 如果窗口不在当前空间，则收起窗口
+                    if let index = dockedWindows.firstIndex(where: { $0.id == dockedWindow.id }) {
+                        var updatedWindow = dockedWindow
+                        updatedWindow.isVisible = false
+                        dockedWindows[index] = updatedWindow
+                        
+                        DockitLogger.shared.logInfo("空间切换 - 收起窗口「\(try? dockedWindow.axWindow.title() ?? "")」")
+                        dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
+                    }
+                }
+            }
+        }
+    }
+    
+    deinit {
+        if let observer = workspaceNotificationObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(observer)
+        }
     }
 } 
