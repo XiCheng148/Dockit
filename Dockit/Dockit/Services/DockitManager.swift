@@ -252,7 +252,7 @@ class DockitManager: ObservableObject {
         
         NotificationHelper.show(
             type: .success,
-            title: "取消停已靠所有窗口"
+            title: "已取消停靠所有窗口"
         )
     }
     

@@ -20,12 +20,23 @@ enum NotificationType {
 }
 
 class NotificationHelper {
+    private static let maxTitleLength = 20
+    
+    private static func truncateText(_ text: String, maxLength: Int) -> String {
+        if text.count <= maxLength {
+            return text
+        }
+        return String(text.prefix(maxLength)) + "..."
+    }
+    
     static func show(
         type: NotificationType,
         title: String,
         description: String? = nil,
         interval: TimeInterval = 2
     ) {
+        let truncatedTitle = truncateText(title, maxLength: maxTitleLength)
+        
         NotchNotification.present(
             leadingView: Rectangle().hidden().frame(width: 4),
             bodyView: HStack() {
@@ -33,9 +44,8 @@ class NotificationHelper {
                     .font(.system(size: 28))
                     .padding(.trailing, 16)
                 HStack {
-                    Spacer()
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(title)
+                        Text(truncatedTitle)
                             .font(.system(size: 14))
                             .bold()
                         if let description = description {
@@ -43,7 +53,6 @@ class NotificationHelper {
                                 .font(.system(size: 12))
                         }
                     }
-                    Spacer()
                 }
             },
             interval: interval
