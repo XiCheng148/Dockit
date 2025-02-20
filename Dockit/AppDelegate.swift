@@ -40,10 +40,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "inset.filled.trailinghalf.arrow.trailing.rectangle", accessibilityDescription: "Dockit")
-            button.image?.size = NSSize(width: 18, height: 18)
+            // 加载 SVG 图标
+            if let svgPath = Bundle.main.path(forResource: "menubar-icon", ofType: "svg"),
+               let svgData = try? Data(contentsOf: URL(fileURLWithPath: svgPath)) {
+                if let image = NSImage(data: svgData) {
+                    image.size = NSSize(width: 18, height: 14)
+                    // image.isTemplate = true  // 这会让图标自动适应系统主题色
+                    
+                    // 保持原始比例
+                    button.image = image
+                }
+            }
         }
-        statusItem?.menu = menu
     }
 
     @objc private func openSettings() {
