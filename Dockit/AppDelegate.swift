@@ -51,6 +51,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     button.image = image
                 }
             }
+            
+            // 添加这一行来关联菜单
+            statusItem?.menu = menu
         }
     }
 
