@@ -39,7 +39,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             devItem.isEnabled = false  // 设置为不可点击
             menu.addItem(devItem)
         #endif
-        menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "设置", action: #selector(openSettings), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "退出", action: #selector(quit), keyEquivalent: ""))
