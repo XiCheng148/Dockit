@@ -35,9 +35,11 @@ struct DockedWindow: Identifiable {
             case kAXUIElementDestroyedNotification:
                 // 窗口关闭时取消停靠
                 if let id = manager.dockedWindows.first(where: { $0.axWindow == axWindow })?.id {
+                    // 窗口已关闭，使用安全的方式获取标题
+                    let windowTitle = (try? axWindow.title()) ?? "未知窗口"
                     NotificationHelper.show(
                         type: .success,
-                        title: try! axWindow.title() ?? "",
+                        title: windowTitle,
                         description: "已取消停靠"
                     )
                     manager.undockWindow(id, reason: .windowClosed)
@@ -83,7 +85,7 @@ struct DockedWindow: Identifiable {
                         )
                         NotificationHelper.show(
                             type: .success,
-                            title: try! axWindow.title() ?? "",
+                            title: (try? axWindow.title()) ?? "未知窗口",
                             description: "已取消停靠"
                         )
                         manager.undockWindow(dockedWindow.id, reason: .dragDistance)

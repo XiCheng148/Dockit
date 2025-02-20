@@ -155,7 +155,7 @@ class DockitManager: ObservableObject {
             )
         } else {
             DockitLogger.shared.logWindowUndocked(
-                "未知窗口",  // 或者可以缓存窗口标题
+                "未知窗口",  // 窗口关闭时使用默认标题
                 reason: reason,
                 frame: nil
             )
@@ -169,12 +169,15 @@ class DockitManager: ObservableObject {
             )
         }
         
-        // 先移除窗口，再停止监听
+        // 先移除窗口，再发送通知
         dockedWindows.removeAll { $0.id == id }
+        
+        // 安全地获取窗口标题
+        let windowTitle = (try? window.axWindow.title()) ?? "未知窗口"
         
         NotificationHelper.show(
             type: .success,
-            title: try! window.axWindow.title() ?? "",
+            title: windowTitle,
             description: "已取消停靠"
         )
     }
@@ -253,11 +256,6 @@ class DockitManager: ObservableObject {
             // 如果无法获取窗口框架，说明窗口可能已经关闭
             guard let _ = try? dockedWindow.axWindow.frame() else {
                 undockWindow(dockedWindow.id, reason: .windowClosed)
-                NotificationHelper.show(
-                    type: .success,
-                    title: try! dockedWindow.axWindow.title() ?? "",
-                    description: "已取消停靠"
-                )
                 return
             }
             
@@ -274,7 +272,7 @@ class DockitManager: ObservableObject {
             
             let shouldShow = dockedWindow.isVisible 
                 ? dockedWindow.windowArea.contains(point)
-                : (dockedWindow.triggerArea.contains(point) && allOtherWindowsHidden) // 增加条件：所有其他窗口都隐藏
+                : (dockedWindow.triggerArea.contains(point) && allOtherWindowsHidden)
                 
             if shouldShow != dockedWindow.isVisible {
                 var updatedWindow = dockedWindow
