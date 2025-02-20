@@ -33,7 +33,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupMenu() {
         let menu = NSMenu()
-        
+        #if DEBUG
+            // 添加开发环境标识菜单项
+            let devItem = NSMenuItem(title: "开发环境", action: nil, keyEquivalent: "")
+            devItem.isEnabled = false  // 设置为不可点击
+            menu.addItem(devItem)
+        #endif
+        menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "设置", action: #selector(openSettings), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "退出", action: #selector(quit), keyEquivalent: ""))
@@ -44,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let svgPath = Bundle.main.path(forResource: "menubar-icon", ofType: "svg"),
                let svgData = try? Data(contentsOf: URL(fileURLWithPath: svgPath)) {
                 if let image = NSImage(data: svgData) {
-                    image.size = NSSize(width: 18, height: 14)
+                    image.size = NSSize(width: 16, height: 12)
                     // image.isTemplate = true  // 这会让图标自动适应系统主题色
                     
                     // 保持原始比例
