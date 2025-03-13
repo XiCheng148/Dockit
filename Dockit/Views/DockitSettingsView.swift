@@ -86,6 +86,7 @@ struct DockitSettingsView: View {
     @State private var hasAccessibility: Bool = false
     @State private var showingRestartAlert: Bool = false
     @State private var cancellables = Set<AnyCancellable>()
+    @State private var showPreview: Bool = true
     
     @ObservedObject private var manager = DockitManager.shared
     
@@ -204,6 +205,20 @@ struct DockitSettingsView: View {
                         }
                 }
                 .help("取消所有已停靠的窗口")
+            }
+            
+            Section(header: Text("预览选项").font(.headline)) {
+                HStack(spacing: 4) {
+                    Toggle("显示停靠预览", isOn: $showPreview)
+                        .onHover { hovering in
+                            if hovering {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
+                        }
+                    HelpIcon(text: "显示窗口停靠时的动画预览")
+                }
             }
         }
         .formStyle(.grouped)

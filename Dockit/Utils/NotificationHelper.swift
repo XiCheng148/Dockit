@@ -1,5 +1,6 @@
 import SwiftUI
 import NotchNotification
+import AppKit
 
 enum NotificationType {
     case success
@@ -37,12 +38,18 @@ class NotificationHelper {
     ) {
         let truncatedTitle = truncateText(title, maxLength: maxTitleLength)
         
+        // 获取应用图标并调整大小
+        let appIcon = NSImage(named: NSImage.applicationIconName) ?? NSImage()
+        let resizedIcon = resizeImage(appIcon, to: CGSize(width: 18, height: 18))
+        
         NotchNotification.present(
-            leadingView: Rectangle().hidden().frame(width: 4),
+            // 使用调整过大小的图标
+            leadingView: Image(nsImage: resizedIcon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 18, height: 18),
+            trailingView: Image(systemName: type.icon),
             bodyView: HStack() {
-                Image(systemName: type.icon)
-                    .font(.system(size: 28))
-                    .padding(.trailing, 16)
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(truncatedTitle)
@@ -57,5 +64,20 @@ class NotificationHelper {
             },
             interval: interval
         )
+    }
+    
+    // 辅助函数：调整 NSImage 大小
+    private static func resizeImage(_ image: NSImage, to size: CGSize) -> NSImage {
+        let newImage = NSImage(size: size)
+        newImage.lockFocus()
+        
+        NSGraphicsContext.current?.imageInterpolation = .high
+        image.draw(in: NSRect(origin: .zero, size: size),
+                  from: NSRect(origin: .zero, size: image.size),
+                  operation: .copy,
+                  fraction: 1.0)
+        
+        newImage.unlockFocus()
+        return newImage
     }
 } 

@@ -33,16 +33,16 @@ extension AxWindow {
             return
         }
         
-        let newFrame = calculateDockFrame(
-            currentFrame: currentFrame,
+        let newPosition = WindowPositionCalculator.calculateCollapsedPosition(
+            window: currentFrame,
             edge: edge,
             screen: screen,
             exposedPixels: exposedPixels
         )
         
         do {
-            try setPosition(newFrame.origin)
-            DockitLogger.shared.logInfo("窗口已移动到目标位置：\(newFrame.origin)")
+            try setPosition(newPosition)
+            DockitLogger.shared.logInfo("窗口已移动到目标位置：\(newPosition)")
         } catch {
             DockitLogger.shared.logError("停靠窗口失败", error: error)
             NotificationHelper.show(
@@ -52,29 +52,30 @@ extension AxWindow {
         }
     }
     
-    private func calculateDockFrame(
-        currentFrame: CGRect,
-        edge: DockEdge,
-        screen: NSScreen,
-        exposedPixels: CGFloat
-    ) -> CGRect {
-        let coordinator = GlobalCoordinateSystem.shared
-        let targetScreen = coordinator.getScreen(for: currentFrame) ?? screen
-        var newFrame = currentFrame
-        
-        // 将窗口坐标转换为全局坐标
-        let globalFrame = coordinator.calculateGlobalFrame(currentFrame, for: targetScreen)
-        
-        switch edge {
-        case .left:
-            newFrame.origin.x = targetScreen.frame.minX - currentFrame.width + exposedPixels
-        case .right:
-            newFrame.origin.x = targetScreen.frame.maxX - exposedPixels
+    func expandTo(_ edge: DockEdge) {
+        guard let currentFrame = try? frame(),
+              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) })
+        else {
+            DockitLogger.shared.logError("无法获取窗口或屏幕信息")
+            return
         }
         
-        // 将新位置转换回本地坐标
-        let localFrame = coordinator.calculateLocalFrame(newFrame, for: targetScreen)
-        return localFrame
+        let newPosition = WindowPositionCalculator.calculateExpandedPosition(
+            window: currentFrame,
+            edge: edge,
+            screen: screen
+        )
+        
+        do {
+            try setPosition(newPosition)
+            DockitLogger.shared.logInfo("窗口已展开到目标位置：\(newPosition)")
+        } catch {
+            DockitLogger.shared.logError("展开窗口失败", error: error)
+            NotificationHelper.show(
+                type: .error,
+                title: "展开窗口失败"
+            )
+        }
     }
 
     func safeTitle() -> String {

@@ -310,17 +310,7 @@ class DockitManager: ObservableObject {
                         window.focus()
                     }
                     
-                    if let currentFrame = try? dockedWindow.axWindow.frame(),
-                       let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) {
-                        var newOrigin = currentFrame.origin
-                        switch dockedWindow.edge {
-                        case .left:
-                            newOrigin.x = screen.frame.minX
-                        case .right:
-                            newOrigin.x = screen.frame.maxX - currentFrame.width
-                        }
-                        try? dockedWindow.axWindow.setPosition(newOrigin)
-                    }
+                    dockedWindow.axWindow.expandTo(dockedWindow.edge)
                 } else {
                     dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
                 }

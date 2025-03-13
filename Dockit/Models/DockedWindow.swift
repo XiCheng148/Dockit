@@ -52,29 +52,26 @@ struct DockedWindow: Identifiable {
                     let coordinator = GlobalCoordinateSystem.shared
                     let targetScreen = coordinator.getScreen(for: currentFrame) ?? NSScreen.main!
                     
-                    // 计算停靠位置的 X 坐标（在全局坐标系中）
-                    let globalFrame = coordinator.calculateGlobalFrame(currentFrame, for: targetScreen)
-                    let dockedX: CGFloat
-                    switch dockedWindow.edge {
-                    case .left:
-                        dockedX = targetScreen.frame.minX
-                    case .right:
-                        dockedX = targetScreen.frame.maxX - currentFrame.width
-                    }
+                    // 使用新工具类判断是否为正常停靠移动
+                    let isNormalDockMovement = WindowPositionCalculator.isCollapsedPosition(
+                        window: currentFrame,
+                        edge: dockedWindow.edge,
+                        screen: targetScreen,
+                        exposedPixels: DockitManager.shared.exposedPixels
+                    ) || WindowPositionCalculator.isExpandedPosition(
+                        window: currentFrame,
+                        edge: dockedWindow.edge,
+                        screen: targetScreen
+                    )
                     
                     // 计算与停靠位置的距离
-                    let distance = abs(currentFrame.origin.x - dockedX)
-                    
-                    // 检查是否是正常的展开/收起移动
-                    let isNormalDockMovement: Bool
-                    switch dockedWindow.edge {
-                    case .left:
-                        isNormalDockMovement = currentFrame.origin.x == targetScreen.frame.minX || // 展开状态
-                                              currentFrame.origin.x == targetScreen.frame.minX - currentFrame.width + manager.exposedPixels // 收起状态
-                    case .right:
-                        isNormalDockMovement = currentFrame.origin.x == targetScreen.frame.maxX - currentFrame.width || 
-                                              currentFrame.origin.x == targetScreen.frame.maxX - manager.exposedPixels
-                    }
+                    let dockedPosition = WindowPositionCalculator.calculateCollapsedPosition(
+                        window: currentFrame,
+                        edge: dockedWindow.edge,
+                        screen: targetScreen,
+                        exposedPixels: DockitManager.shared.exposedPixels
+                    )
+                    let distance = abs(currentFrame.origin.x - dockedPosition.x)
                     
                     // 只有不是正常的停靠移动，且超过阈值时才取消停靠
                     if !isNormalDockMovement && distance > 50 {
