@@ -1,5 +1,5 @@
 import SwiftUI
-import NotchNotification
+import DynamicNotchKit
 import AppKit
 
 enum NotificationType {
@@ -22,6 +22,8 @@ enum NotificationType {
 
 class NotificationHelper {
     private static let maxTitleLength = 20
+    // 创建一个单例实例以便重用
+    static var dynamicNotch = DynamicNotchInfo(title: "Airpods")
     
     private static func truncateText(_ text: String, maxLength: Int) -> String {
         if text.count <= maxLength {
@@ -30,7 +32,7 @@ class NotificationHelper {
         return String(text.prefix(maxLength)) + "..."
     }
     
-    static func show(
+    @MainActor static func show(
         type: NotificationType,
         title: String,
         description: String? = nil,
@@ -42,28 +44,15 @@ class NotificationHelper {
         let appIcon = NSImage(named: NSImage.applicationIconName) ?? NSImage()
         let resizedIcon = resizeImage(appIcon, to: CGSize(width: 18, height: 18))
         
-        NotchNotification.present(
-            // 使用调整过大小的图标
-            leadingView: Image(nsImage: resizedIcon)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 18, height: 18),
-            trailingView: Image(systemName: type.icon),
-            bodyView: HStack() {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(truncatedTitle)
-                            .font(.system(size: 14))
-                            .bold()
-                        if let description = description {
-                            Text(description)
-                                .font(.system(size: 12))
-                        }
-                    }
-                }
-            },
-            interval: interval
+        // 使用DynamicNotchKit的setContent方法
+        dynamicNotch.setContent(
+            icon: Image(nsImage: resizedIcon),
+            title: truncatedTitle,
+            description: description
         )
+        
+        // 显示通知，设置显示时间
+        dynamicNotch.show(for: interval)
     }
     
     // 辅助函数：调整 NSImage 大小

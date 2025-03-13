@@ -1,5 +1,5 @@
 {
-  "originHash" : "a6131970214c47552e77f7bb2bb2127ec4c1efdb585e692559fa206ef3ea6707",
+  "originHash" : "cf51b7399828aed0196a5fc78f0aa54e883788872a57ee3d0fcb80b854698c44",
   "pins" : [
     {
       "identity" : "defaults",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "ef1b2318fb549002bb533bec3a8ad98ae09f2cb6",
         "version" : "9.0.0"
+      }
+    },
+    {
+      "identity" : "dynamicnotchkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MrKai77/DynamicNotchKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "0f2213c671585db887f53e86812134a7a6cc74e5"
       }
     },
     {
@@ -26,15 +35,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc"
-      }
-    },
-    {
-      "identity" : "notchnotification",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Lakr233/NotchNotification.git",
-      "state" : {
-        "revision" : "e4d255d789eba108184b0aa1f6361a4adfb302f6",
-        "version" : "1.2.1"
       }
     },
     {

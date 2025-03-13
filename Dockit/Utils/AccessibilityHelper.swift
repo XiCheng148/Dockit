@@ -1,8 +1,7 @@
 import AppKit
 import Combine
-// import DynamicNotchKit
 import SwiftUI
-import NotchNotification
+
 
 class AccessibilityHelper {
     static let shared = AccessibilityHelper()

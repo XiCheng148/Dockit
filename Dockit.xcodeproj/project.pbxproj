@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 460E59EA2D2448C000787017 /* KeyboardShortcuts */; };
-		462614822D351336006CBF81 /* NotchNotification in Frameworks */ = {isa = PBXBuildFile; productRef = 462614812D351336006CBF81 /* NotchNotification */; };
+		462BCA8F2D82DF9B00B475FC /* DynamicNotchKit in Frameworks */ = {isa = PBXBuildFile; productRef = 462BCA8E2D82DF9B00B475FC /* DynamicNotchKit */; };
 		46A1EF242D2471EF00E83601 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF232D2471EF00E83601 /* Defaults */; };
 		46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF252D2471EF00E83601 /* DefaultsMacros */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
@@ -34,11 +34,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */,
+				462BCA8F2D82DF9B00B475FC /* DynamicNotchKit in Frameworks */,
 				46A1EF242D2471EF00E83601 /* Defaults in Frameworks */,
 				460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */,
 				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
 				64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */,
-				462614822D351336006CBF81 /* NotchNotification in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,7 +94,7 @@
 				460E59EA2D2448C000787017 /* KeyboardShortcuts */,
 				46A1EF232D2471EF00E83601 /* Defaults */,
 				46A1EF252D2471EF00E83601 /* DefaultsMacros */,
-				462614812D351336006CBF81 /* NotchNotification */,
+				462BCA8E2D82DF9B00B475FC /* DynamicNotchKit */,
 			);
 			productName = Dockit;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Dockit.app */;
@@ -128,7 +128,7 @@
 				64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */,
-				462614802D351336006CBF81 /* XCRemoteSwiftPackageReference "NotchNotification" */,
+				462BCA8D2D82DF9B00B475FC /* XCRemoteSwiftPackageReference "DynamicNotchKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -379,12 +379,12 @@
 				kind = branch;
 			};
 		};
-		462614802D351336006CBF81 /* XCRemoteSwiftPackageReference "NotchNotification" */ = {
+		462BCA8D2D82DF9B00B475FC /* XCRemoteSwiftPackageReference "DynamicNotchKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Lakr233/NotchNotification.git";
+			repositoryURL = "https://github.com/MrKai77/DynamicNotchKit.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.1;
+				branch = main;
+				kind = branch;
 			};
 		};
 		46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */ = {
@@ -411,10 +411,10 @@
 			package = 460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
 		};
-		462614812D351336006CBF81 /* NotchNotification */ = {
+		462BCA8E2D82DF9B00B475FC /* DynamicNotchKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 462614802D351336006CBF81 /* XCRemoteSwiftPackageReference "NotchNotification" */;
-			productName = NotchNotification;
+			package = 462BCA8D2D82DF9B00B475FC /* XCRemoteSwiftPackageReference "DynamicNotchKit" */;
+			productName = DynamicNotchKit;
 		};
 		46A1EF232D2471EF00E83601 /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
