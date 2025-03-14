@@ -6,22 +6,30 @@ class DockPreviewController {
     static let shared = DockPreviewController()
     
     private var windowController: NSWindowController?
-    private var closeTimer: Timer?
+    private var autoCloseTimer: Timer?
+    
+    // 定义动画持续时间常量
+    private let animationDuration: TimeInterval = 0.6
+    // 定义定时器额外缓冲时间
+    private let timerBuffer: TimeInterval = 0.4
     
     private var isPreviewEnabled: Bool {
         return Defaults[.showPreview]
     }
     
     deinit {
-        closePreviewWindow()
-        closeTimer?.invalidate()
-        closeTimer = nil
+        autoCloseTimer?.invalidate()
+        forceClosePreviewWindow()
     }
     
     private init() {}
     
     func showPreview(for edge: DockEdge, window: CGRect) {
         guard isPreviewEnabled else { return }
+        
+        // 取消之前的定时器并关闭已有窗口
+        autoCloseTimer?.invalidate()
+        forceClosePreviewWindow()
         
         guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(window) }) else { return }
         
@@ -43,8 +51,6 @@ class DockPreviewController {
     }
     
     private func createPreviewWindow(initialFrame: CGRect, targetFrame: CGRect) {
-        closePreviewWindow()
-        
         let screenFrame = NSScreen.main?.frame ?? NSScreen.screens.first!.frame
         
         let convertedInitialFrame = CGRect(
@@ -82,32 +88,33 @@ class DockPreviewController {
             panel.orderFrontRegardless()
             windowController = NSWindowController(window: panel)
             
+            // 设置自动关闭定时器，确保比动画时间长
+            setupAutoCloseTimer()
+            
             NSAnimationContext.runAnimationGroup({ context in
-                context.duration = 0.5
+                context.duration = animationDuration
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                 panel.animator().setFrame(convertedTargetFrame, display: true)
-            }, completionHandler: { [weak self] in
-                self?.closePreviewWindow()
-            })
+            }, completionHandler: nil)
         }
     }
     
-    func closePreviewWindow() {
-        closeTimer?.invalidate()
-        closeTimer = nil
-        
-        guard let panel = windowController?.window else { return }
-        
-        weak var weakController = windowController
-        
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.3
-            panel.animator().alphaValue = 0
-        }, completionHandler: {
+    private func forceClosePreviewWindow() {
+        if let panel = windowController?.window, panel.isVisible {
             panel.contentView = nil
-            weakController?.close()
-            weakController = nil
-            self.windowController = nil
-        })
+            panel.close()
+        }
+        windowController = nil
+    }
+    
+    private func setupAutoCloseTimer() {
+        autoCloseTimer?.invalidate()
+        
+        // 确保定时器时间始终比动画时间长一点
+        let timerDuration = animationDuration + timerBuffer
+        
+        autoCloseTimer = Timer.scheduledTimer(withTimeInterval: timerDuration, repeats: false) { [weak self] _ in
+            self?.forceClosePreviewWindow()
+        }
     }
 } 

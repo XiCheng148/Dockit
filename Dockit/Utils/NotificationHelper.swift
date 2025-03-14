@@ -95,7 +95,7 @@ class NotificationHelper {
                         }
                         Spacer()
                         Image(systemName: type.actionIcon)
-                            .font(.system(size: 32))
+                            .font(.system(size: 30))
                     }
                 )
             }

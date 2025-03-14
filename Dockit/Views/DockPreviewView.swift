@@ -15,11 +15,7 @@ struct DockPreviewView: View {
                 RoundedRectangle(cornerRadius: 8)
                     .strokeBorder(Color.gray.opacity(0.3), lineWidth: 1)
                 
-                // 使用系统主题色边框
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.accentColor, lineWidth: 4)
             }
-            .padding(4)
         }
     }
 }
