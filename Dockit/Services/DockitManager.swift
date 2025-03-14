@@ -71,6 +71,15 @@ class DockitManager: ObservableObject {
         }
     }
     
+    @Published private var _notchStyle: String
+    var notchStyle: String {
+        get { _notchStyle }
+        set {
+            _notchStyle = newValue
+            Defaults[.notchStyle] = newValue
+        }
+    }
+    
     private let eventMonitor = DockitEventMonitor()
     
     private var workspaceNotificationObserver: NSObjectProtocol?
@@ -81,6 +90,7 @@ class DockitManager: ObservableObject {
         self._isEnabled = Defaults[.isEnabled]
         self._respectSpaces = Defaults[.respectSpaces]
         self._fps = Double(Defaults[.fps])
+        self._notchStyle = Defaults[.notchStyle]
         
         DockitLogger.shared.logInfo("DockitManager 初始化 - 露出像素: \(exposedPixels)px, 触发区域宽度: \(triggerAreaWidth)px")
         
@@ -116,10 +126,10 @@ class DockitManager: ObservableObject {
         guard let app = NSWorkspace.shared.frontmostApplication,
               let window = Windows.shared.inner.first(where: { $0.axWindow == axWindow }) else {
             DockitLogger.shared.logError("无法获取应用或窗口信息")
-//            NotificationHelper.show(
-//                type: .warning,
-//                title: "无法获取前台窗口"
-//            )
+           NotificationHelper.show(
+               type: .warning,
+               title: "无法获取前台窗口"
+           )
             return
         }
         
@@ -134,20 +144,12 @@ class DockitManager: ObservableObject {
         // let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
         let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
         
-//        NotificationHelper.show(
-//            type: .custom(edge == .left ? "arrowshape.left.fill" : "arrowshape.right.fill"),
-//            title: try! axWindow.title() ?? "",
-//            description: "已停靠到\(edge == .left ? "左" : "右")边"
-//        )
-
-        // let dynamicNotch = DynamicNotchInfo (
-        //     icon: edge == .left ? 
-        //         Image(systemName: "arrowshape.left.fill") : 
-        //         Image(systemName: "arrowshape.right.fill"),
-        //     title: "\(try? axWindow.title())",
-        //     description: "已停靠到\(edge == .left ? "左" : "右")边"
-        // )
-        // dynamicNotch.show(for: 2)
+       NotificationHelper.show(
+           type: .custom(edge == .left ? "arrowshape.left.fill" : "arrowshape.right.fill"),
+           title: try! axWindow.title() ?? "",
+           description: "已停靠到\(edge == .left ? "左" : "右")边",
+           windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
+       )
 
         axWindow.dockTo(edge, exposedPixels: exposedPixels)
     }
@@ -184,11 +186,12 @@ class DockitManager: ObservableObject {
         // 安全地获取窗口标题
         let windowTitle = (try? window.axWindow.title()) ?? "未知窗口"
         
-//        NotificationHelper.show(
-//            type: .success,
-//            title: windowTitle,
-//            description: "已取消停靠"
-//        )
+       NotificationHelper.show(
+           type: .success,
+           title: windowTitle,
+           description: "已取消停靠",
+           windowIcon: NotificationHelper.getAppIconForWindow(window.axWindow)
+       )
     }
     
     func undockAllWindows(type: UndockAllWindowsType = .normal) {
@@ -197,10 +200,10 @@ class DockitManager: ObservableObject {
         if dockedWindows.isEmpty {
             DockitLogger.shared.logInfo("没有停靠的窗口")
             if type == .normal {
-//                NotificationHelper.show(
-//                    type: .warning,
-//                    title: "没有停靠的窗口"
-//                )
+               NotificationHelper.show(
+                   type: .warning,
+                   title: "没有停靠的窗口"
+               )
             }
             return
         }
@@ -248,10 +251,10 @@ class DockitManager: ObservableObject {
         
         dockedWindows.removeAll()
         
-//        NotificationHelper.show(
-//            type: .success,
-//            title: "已取消停靠所有窗口"
-//        )
+       NotificationHelper.show(
+           type: .success,
+           title: "已取消停靠所有窗口"
+       )
     }
     
     private func setupEventMonitor() {

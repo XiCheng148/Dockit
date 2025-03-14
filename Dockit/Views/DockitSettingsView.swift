@@ -173,6 +173,20 @@ struct DockitSettingsView: View {
                         HelpIcon(text: "更快的响应速度会增加 CPU 占用")
                     }
                 }
+                
+                LabeledContent {
+                    Picker("", selection: $manager.notchStyle) {
+                        Text("自动").tag("auto")
+                        Text("刘海").tag("notch")
+                        Text("浮动").tag("floating")
+                    }
+                    .pickerStyle(.segmented)
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("通知样式")
+                        HelpIcon(text: "选择通知在屏幕上的显示样式")
+                    }
+                }
             }
             
             Section(header: Text("快捷键").font(.headline)) {

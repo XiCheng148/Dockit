@@ -37,11 +37,12 @@ struct DockedWindow: Identifiable {
                 if let id = manager.dockedWindows.first(where: { $0.axWindow == axWindow })?.id {
                     // 窗口已关闭，使用安全的方式获取标题
                     let windowTitle = (try? axWindow.title()) ?? "未知窗口"
-//                    NotificationHelper.show(
-//                        type: .success,
-//                        title: windowTitle,
-//                        description: "已取消停靠"
-//                    )
+                   NotificationHelper.show(
+                       type: .success,
+                       title: windowTitle,
+                       description: "已取消停靠",
+                       windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
+                   )
                     manager.undockWindow(id, reason: .windowClosed)
                 }
                 
@@ -80,11 +81,12 @@ struct DockedWindow: Identifiable {
                             distance: distance,
                             frame: try? axWindow.frame()
                         )
-//                        NotificationHelper.show(
-//                            type: .success,
-//                            title: (try? axWindow.title()) ?? "未知窗口",
-//                            description: "已取消停靠"
-//                        )
+                       NotificationHelper.show(
+                           type: .success,
+                           title: (try? axWindow.title()) ?? "未知窗口",
+                           description: "已取消停靠",
+                           windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
+                       )
                         manager.undockWindow(dockedWindow.id, reason: .dragDistance)
                     }
                 }

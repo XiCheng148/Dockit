@@ -9,4 +9,6 @@ extension Defaults.Keys {
     static let respectSpaces = Key<Bool>("respectSpaces", default: true)
     static let screenWithMouse = Key<Bool>("screenWithMouse", default: false)
     static let showPreview = Key<Bool>("showPreview", default: true)
+    // 添加通知样式设置
+    static let notchStyle = Key<String>("notchStyle", default: "auto")
 } 

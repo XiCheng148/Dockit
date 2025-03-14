@@ -2,6 +2,17 @@ import AppKit
 import Foundation
 import SwiftUI
 
+extension DockEdge {
+    var notificationType: NotificationType {
+        switch self {
+        case .left:
+            return .dockLeft
+        case .right:
+            return .dockRight
+        }
+    }
+}
+
 extension AxWindow {
     func setPosition(_ position: CGPoint) throws {
         var point = position
@@ -43,10 +54,13 @@ extension AxWindow {
             DockitLogger.shared.logInfo("窗口已移动到目标位置：\(newPosition)")
         } catch {
             DockitLogger.shared.logError("停靠窗口失败", error: error)
-            // NotificationHelper.show(
-            //     type: .error,
-            //     title: "停靠窗口失败"
-            // )
+            Task { @MainActor in
+                NotificationHelper.show(
+                    type: .error,
+                    title: "停靠窗口失败",
+                    windowIcon: NotificationHelper.getAppIconForWindow(self)
+                )
+            }
         }
     }
     
@@ -69,10 +83,13 @@ extension AxWindow {
             DockitLogger.shared.logInfo("窗口已展开到目标位置：\(newPosition)")
         } catch {
             DockitLogger.shared.logError("展开窗口失败", error: error)
-            // NotificationHelper.show(
-            //     type: .error,
-            //     title: "展开窗口失败"
-            // )
+            Task { @MainActor in
+                NotificationHelper.show(
+                    type: .error,
+                    title: "展开窗口失败",
+                    windowIcon: NotificationHelper.getAppIconForWindow(self)
+                )
+            }
         }
     }
 

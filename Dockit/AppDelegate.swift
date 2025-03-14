@@ -94,10 +94,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 先取消所有窗口停靠
         DockitManager.shared.undockAllWindows(type: .quit)
 
-//        NotificationHelper.show(
-//            type: .success,
-//            title: "退出前清理停靠窗口"
-//        )
+        NotificationHelper.show(
+            type: .success,
+            title: "退出前清理停靠窗口"
+        )
         
         // 延迟一小段时间后退出应用,确保取消停靠动作完成
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
