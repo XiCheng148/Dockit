@@ -48,7 +48,7 @@ class NotificationHelper {
         case "notch": return notchStyleNotch
         case "floating": return floatingNotch
         default: return autoNotch
-        }
+        } 
     }
     
     private static func truncateText(_ text: String, maxLength: Int) -> String {
@@ -77,7 +77,7 @@ class NotificationHelper {
             
             // 使用传入的窗口图标，如果没有则使用应用图标
             let appIcon = windowIcon ?? NSImage(named: NSImage.applicationIconName) ?? NSImage()
-            let resizedIcon = resizeImage(appIcon, to: CGSize(width: 28, height: 28))
+            let resizedIcon = resizeImage(appIcon, to: CGSize(width: 36, height: 36))
             
             // 使用当前选中样式的DynamicNotch实例
             currentNotch.setContent {
@@ -85,7 +85,7 @@ class NotificationHelper {
                     HStack {
                         Image(nsImage: resizedIcon)
                         Spacer()
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .center) {
                             Text(truncatedTitle)
                                 .font(.headline)
                             if let description = description {
@@ -95,7 +95,7 @@ class NotificationHelper {
                         }
                         Spacer()
                         Image(systemName: type.actionIcon)
-                            .font(.system(size: 24))
+                            .font(.system(size: 32))
                     }
                 )
             }
