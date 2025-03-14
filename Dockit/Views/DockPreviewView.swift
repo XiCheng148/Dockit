@@ -14,7 +14,6 @@ struct DockPreviewView: View {
                 // 简化边框
                 RoundedRectangle(cornerRadius: 8)
                     .strokeBorder(Color.gray.opacity(0.3), lineWidth: 1)
-                
             }
         }
     }
