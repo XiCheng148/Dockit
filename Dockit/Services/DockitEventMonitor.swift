@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import Defaults
 
 class DockitEventMonitor {
     var onMouseMoved: ((NSPoint) -> Void)?
@@ -8,10 +9,10 @@ class DockitEventMonitor {
     
     // 使用 FPS 来控制采样率
     // 4(节能)、10(平衡)、30(流畅)、60(跟手)、120(丝滑)
-    private var fps: Double = 30
+    private var fps: Int = Defaults[.fps]
     
     private var throttleInterval: TimeInterval {
-        return 1.0 / fps  // 1000ms / 60 ≈ 16.7ms
+        return 1.0 / Double(fps)  // 1000ms / 60 ≈ 16.7ms
     }
     
     func startMonitoring() {
@@ -37,7 +38,7 @@ class DockitEventMonitor {
         }
     }
     
-    func updateFPS(_ newFPS: Double) {
+    func updateFPS(_ newFPS: Int) {
         fps = newFPS
         // 如果正在监听，重启监听以应用新的 FPS
         if mouseMonitor != nil {

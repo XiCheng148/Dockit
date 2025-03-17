@@ -61,12 +61,12 @@ class DockitManager: ObservableObject {
         }
     }
     
-    @Published private var _fps: Double
-    var fps: Double {
+    @Published private var _fps: Int
+    var fps: Int {
         get { _fps }
         set {
             _fps = newValue
-            Defaults[.fps] = Int(newValue)
+            Defaults[.fps] = newValue
             eventMonitor.updateFPS(newValue)
         }
     }
@@ -89,7 +89,7 @@ class DockitManager: ObservableObject {
         self._triggerAreaWidth = Double(Defaults[.triggerAreaWidth])
         self._isEnabled = Defaults[.isEnabled]
         self._respectSpaces = Defaults[.respectSpaces]
-        self._fps = Double(Defaults[.fps])
+        self._fps = Defaults[.fps]
         self._notchStyle = Defaults[.notchStyle]
         
         DockitLogger.shared.logInfo("DockitManager 初始化 - 露出像素: \(exposedPixels)px, 触发区域宽度: \(triggerAreaWidth)px")
@@ -276,6 +276,7 @@ class DockitManager: ObservableObject {
     }
     
     func handleMouseMovement(_ point: NSPoint) {
+        DockitLogger.shared.logInfo("鼠标移动到 \(point)")
         dockedWindows.forEach { dockedWindow in
             // 如果无法获取窗口框架，说明窗口可能已经关闭
             guard let _ = try? dockedWindow.axWindow.frame() else {
