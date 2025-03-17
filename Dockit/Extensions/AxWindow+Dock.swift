@@ -35,17 +35,32 @@ extension AxWindow {
     }
 
     func dockTo(_ edge: DockEdge, exposedPixels: CGFloat) {
-        guard let currentFrame = try? frame(),
-              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) })
-        else {
-            DockitLogger.shared.logError("无法获取窗口或屏幕信息")
+        guard let currentFrame = try? frame() else {
+            DockitLogger.shared.logError("无法获取窗口信息")
             return
+        }
+        
+        // 只使用主屏幕
+        guard let mainScreen = NSScreen.main else {
+            DockitLogger.shared.logError("无法获取主屏幕")
+            return
+        }
+        
+        // 检查窗口是否在主屏幕上
+        if !mainScreen.frame.intersects(currentFrame) {
+            DockitLogger.shared.logInfo("窗口不在主屏幕上，将被移动至主屏幕")
+            
+            // 将窗口移动到主屏幕中心
+            let centerX = mainScreen.frame.midX - (currentFrame.width / 2)
+            let centerY = mainScreen.frame.midY - (currentFrame.height / 2)
+            
+            try? setPosition(CGPoint(x: centerX, y: centerY))
         }
         
         let newPosition = WindowPositionCalculator.calculateCollapsedPosition(
             window: currentFrame,
             edge: edge,
-            screen: screen,
+            screen: mainScreen,
             exposedPixels: exposedPixels
         )
         
@@ -65,17 +80,21 @@ extension AxWindow {
     }
     
     func expandTo(_ edge: DockEdge) {
-        guard let currentFrame = try? frame(),
-              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) })
-        else {
-            DockitLogger.shared.logError("无法获取窗口或屏幕信息")
+        guard let currentFrame = try? frame() else {
+            DockitLogger.shared.logError("无法获取窗口信息")
+            return
+        }
+        
+        // 只使用主屏幕
+        guard let mainScreen = NSScreen.main else {
+            DockitLogger.shared.logError("无法获取主屏幕")
             return
         }
         
         let newPosition = WindowPositionCalculator.calculateExpandedPosition(
             window: currentFrame,
             edge: edge,
-            screen: screen
+            screen: mainScreen
         )
         
         do {

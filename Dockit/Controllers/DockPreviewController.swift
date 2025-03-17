@@ -31,10 +31,11 @@ class DockPreviewController {
         autoCloseTimer?.invalidate()
         forceClosePreviewWindow()
         
-        guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(window) }) else { return }
+        // 只使用主屏幕
+        guard let mainScreen = NSScreen.main else { return }
         
         let initialFrame = window
-        let targetFrame = calculateTargetFrame(window: window, edge: edge, screen: screen)
+        let targetFrame = calculateTargetFrame(window: window, edge: edge, screen: mainScreen)
         
         createPreviewWindow(initialFrame: initialFrame, targetFrame: targetFrame)
     }

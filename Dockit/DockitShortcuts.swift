@@ -14,6 +14,16 @@ class DockitShortcuts {
         KeyboardShortcuts.onKeyDown(for: .dockLeft) {
             DockitLogger.shared.logShortcut(.left)
             
+            // 先检查窗口是否在主屏幕上
+            if !DockitManager.shared.isActiveWindowOnMainScreen() {
+                NotificationHelper.show(
+                    type: .warning,
+                    title: "无法停靠窗口",
+                    description: "当前版本仅支持在主屏幕上停靠窗口"
+                )
+                return
+            }
+            
             // 获取当前活动窗口并显示预览
             if let app = NSWorkspace.shared.frontmostApplication {
                 let axApp = AxApplication(element: AXUIElementCreateApplication(app.processIdentifier))
@@ -29,7 +39,17 @@ class DockitShortcuts {
         
         // 注册右侧停靠快捷键
         KeyboardShortcuts.onKeyDown(for: .dockRight) {
-            DockitLogger.shared.logShortcut(.right) 
+            DockitLogger.shared.logShortcut(.right)
+            
+            // 先检查窗口是否在主屏幕上
+            if !DockitManager.shared.isActiveWindowOnMainScreen() {
+                NotificationHelper.show(
+                    type: .warning,
+                    title: "无法停靠窗口",
+                    description: "当前版本仅支持在主屏幕上停靠窗口"
+                )
+                return
+            }
             
             // 获取当前活动窗口并显示预览
             if let app = NSWorkspace.shared.frontmostApplication {

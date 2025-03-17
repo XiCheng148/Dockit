@@ -140,6 +140,11 @@ struct DockitSettingsView: View {
             }
             
             Section(header: Text("高级设置").font(.headline)) {
+                Text("当前版本仅支持在主屏幕上停靠窗口")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.bottom, 8)
+                
                 SliderWithTextField(
                     title: "露出宽度",
                     helpText: "停靠时窗口露出的宽度",

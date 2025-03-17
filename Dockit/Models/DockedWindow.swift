@@ -50,8 +50,7 @@ struct DockedWindow: Identifiable {
                 if let dockedWindow = manager.dockedWindows.first(where: { $0.axWindow == axWindow }),
                    dockedWindow.isVisible,
                    let currentFrame = try? axWindow.frame() {
-                    let coordinator = GlobalCoordinateSystem.shared
-                    let targetScreen = coordinator.getScreen(for: currentFrame) ?? NSScreen.main!
+                    let targetScreen = NSScreen.main!
                     
                     // 使用新工具类判断是否为正常停靠移动
                     let isNormalDockMovement = WindowPositionCalculator.isCollapsedPosition(

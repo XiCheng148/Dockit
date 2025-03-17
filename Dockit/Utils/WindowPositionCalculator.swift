@@ -9,20 +9,22 @@ struct WindowPositionCalculator {
         screen: NSScreen,
         exposedPixels: CGFloat
     ) -> CGPoint {
-        let coordinator = GlobalCoordinateSystem.shared
-        let targetScreen = coordinator.getScreen(for: window) ?? screen
+        // 始终使用主屏幕，忽略传入的screen参数
+        guard let mainScreen = NSScreen.main else {
+            return window.origin
+        }
         
         let newPosition: CGPoint
         
         switch edge {
         case .left:
             newPosition = CGPoint(
-                x: targetScreen.frame.minX - window.width + exposedPixels,
+                x: mainScreen.frame.minX - window.width + exposedPixels,
                 y: window.origin.y
             )
         case .right:
             newPosition = CGPoint(
-                x: targetScreen.frame.maxX - exposedPixels,
+                x: mainScreen.frame.maxX - exposedPixels,
                 y: window.origin.y
             )
         }
@@ -36,20 +38,22 @@ struct WindowPositionCalculator {
         edge: DockEdge,
         screen: NSScreen
     ) -> CGPoint {
-        let coordinator = GlobalCoordinateSystem.shared
-        let targetScreen = coordinator.getScreen(for: window) ?? screen
+        // 始终使用主屏幕，忽略传入的screen参数
+        guard let mainScreen = NSScreen.main else {
+            return window.origin
+        }
         
         let newPosition: CGPoint
         
         switch edge {
         case .left:
             newPosition = CGPoint(
-                x: targetScreen.frame.minX,
+                x: mainScreen.frame.minX,
                 y: window.origin.y
             )
         case .right:
             newPosition = CGPoint(
-                x: targetScreen.frame.maxX - window.width,
+                x: mainScreen.frame.maxX - window.width,
                 y: window.origin.y
             )
         }

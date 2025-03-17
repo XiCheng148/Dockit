@@ -126,10 +126,24 @@ class DockitManager: ObservableObject {
         guard let app = NSWorkspace.shared.frontmostApplication,
               let window = Windows.shared.inner.first(where: { $0.axWindow == axWindow }) else {
             DockitLogger.shared.logError("无法获取应用或窗口信息")
-           NotificationHelper.show(
-               type: .warning,
-               title: "无法获取前台窗口"
-           )
+            NotificationHelper.show(
+                type: .warning,
+                title: "无法获取前台窗口"
+            )
+            return
+        }
+        
+        // 检查窗口是否在主屏幕上
+        guard let windowFrame = try? axWindow.frame(),
+              let mainScreen = NSScreen.main,
+              mainScreen.frame.intersects(windowFrame) else {
+            
+            DockitLogger.shared.logInfo("窗口不在主屏幕上，无法停靠")
+            NotificationHelper.show(
+                type: .warning,
+                title: (try? axWindow.title()) ?? "",
+                description: "窗口不在主屏幕上，无法停靠"
+            )
             return
         }
         
@@ -141,16 +155,14 @@ class DockitManager: ObservableObject {
             edge: edge,
             frame: try? axWindow.frame()
         )
-        // let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
-        let img = edge == .left ? Image(systemName: "arrowshape.left.fill") : Image(systemName: "arrowshape.right.fill")
         
-       NotificationHelper.show(
-           type: .custom(edge == .left ? "arrowshape.left.fill" : "arrowshape.right.fill"),
-           title: try! axWindow.title() ?? "",
-           description: "已停靠到\(edge == .left ? "左" : "右")边",
-           windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
-       )
-
+        NotificationHelper.show(
+            type: .custom(edge == .left ? "arrowshape.left.fill" : "arrowshape.right.fill"),
+            title: try! axWindow.title() ?? "",
+            description: "已停靠到\(edge == .left ? "左" : "右")边",
+            windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
+        )
+        
         axWindow.dockTo(edge, exposedPixels: exposedPixels)
     }
     
@@ -351,6 +363,18 @@ class DockitManager: ObservableObject {
     }
     
     func dockActiveWindow(to edge: DockEdge) {
+        // 首先检查当前窗口是否在主屏幕上
+        if !isActiveWindowOnMainScreen() {
+            DockitLogger.shared.logInfo("窗口不在主屏幕上，无法停靠")
+            NotificationHelper.show(
+                type: .warning,
+                title: "无法停靠窗口",
+                description: "当前版本仅支持在主屏幕上停靠窗口"
+            )
+            return
+        }
+        
+        // 其余逻辑保持不变
         guard let app = NSWorkspace.shared.frontmostApplication else {
             DockitLogger.shared.logError("无法获取当前活动应用")
             return
@@ -384,6 +408,32 @@ class DockitManager: ObservableObject {
                 }
             }
         }
+    }
+    
+    // 添加一个新方法用于检查窗口是否在主屏幕上
+    func isWindowOnMainScreen(_ axWindow: AxWindow) -> Bool {
+        guard let windowFrame = try? axWindow.frame(),
+              let mainScreen = NSScreen.main else {
+            return false
+        }
+        
+        return mainScreen.frame.intersects(windowFrame)
+    }
+    
+    // 添加一个方法检查当前前台窗口是否在主屏幕上
+    func isActiveWindowOnMainScreen() -> Bool {
+        guard let app = NSWorkspace.shared.frontmostApplication else {
+            return false
+        }
+        
+        let axApp = AxApplication(element: AXUIElementCreateApplication(app.processIdentifier))
+        guard let window = try? axApp.focusedWindow(),
+              let frame = try? window.frame(),
+              let mainScreen = NSScreen.main else {
+            return false
+        }
+        
+        return mainScreen.frame.intersects(frame)
     }
     
     deinit {
