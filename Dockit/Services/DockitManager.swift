@@ -80,6 +80,15 @@ class DockitManager: ObservableObject {
         }
     }
     
+    @Published private var _showPreview: Bool
+    var showPreview: Bool {
+        get { _showPreview }
+        set {
+            _showPreview = newValue
+            Defaults[.showPreview] = newValue
+        }
+    }
+    
     private let eventMonitor = DockitEventMonitor()
     
     private var workspaceNotificationObserver: NSObjectProtocol?
@@ -91,6 +100,7 @@ class DockitManager: ObservableObject {
         self._respectSpaces = Defaults[.respectSpaces]
         self._fps = Defaults[.fps]
         self._notchStyle = Defaults[.notchStyle]
+        self._showPreview = Defaults[.showPreview]
         
         DockitLogger.shared.logInfo("DockitManager 初始化 - 露出像素: \(exposedPixels)px, 触发区域宽度: \(triggerAreaWidth)px")
         
@@ -129,20 +139,6 @@ class DockitManager: ObservableObject {
             NotificationHelper.show(
                 type: .warning,
                 title: "无法获取前台窗口"
-            )
-            return
-        }
-        
-        // 检查窗口是否在主屏幕上
-        guard let windowFrame = try? axWindow.frame(),
-              let mainScreen = NSScreen.main,
-              mainScreen.frame.intersects(windowFrame) else {
-            
-            DockitLogger.shared.logInfo("窗口不在主屏幕上，无法停靠")
-            NotificationHelper.show(
-                type: .warning,
-                title: (try? axWindow.title()) ?? "",
-                description: "窗口不在主屏幕上，无法停靠"
             )
             return
         }
@@ -271,7 +267,6 @@ class DockitManager: ObservableObject {
     }
     
     func handleMouseMovement(_ point: NSPoint) {
-        DockitLogger.shared.logInfo("鼠标移动到 \(point)")
         dockedWindows.forEach { dockedWindow in
             // 如果无法获取窗口框架，说明窗口可能已经关闭
             guard let _ = try? dockedWindow.axWindow.frame() else {
@@ -359,22 +354,11 @@ class DockitManager: ObservableObject {
     }
     
     func dockActiveWindow(to edge: DockEdge) {
-        // 首先检查当前窗口是否在主屏幕上
-        if !isActiveWindowOnMainScreen() {
-            DockitLogger.shared.logInfo("窗口不在主屏幕上，无法停靠")
-            NotificationHelper.show(
-                type: .warning,
-                title: "无法停靠窗口",
-                description: "当前版本仅支持在主屏幕上停靠窗口"
-            )
-            return
-        }
-        
-        // 其余逻辑保持不变
         guard let app = NSWorkspace.shared.frontmostApplication else {
             DockitLogger.shared.logError("无法获取当前活动应用")
             return
         }
+        
         let axApp = AxApplication(element: AXUIElementCreateApplication(app.processIdentifier))
         guard let window = try? axApp.focusedWindow() else {
             DockitLogger.shared.logError("无法获取当前焦点窗口")
@@ -404,32 +388,6 @@ class DockitManager: ObservableObject {
                 }
             }
         }
-    }
-    
-    // 添加一个新方法用于检查窗口是否在主屏幕上
-    func isWindowOnMainScreen(_ axWindow: AxWindow) -> Bool {
-        guard let windowFrame = try? axWindow.frame(),
-              let mainScreen = NSScreen.main else {
-            return false
-        }
-        
-        return mainScreen.frame.intersects(windowFrame)
-    }
-    
-    // 添加一个方法检查当前前台窗口是否在主屏幕上
-    func isActiveWindowOnMainScreen() -> Bool {
-        guard let app = NSWorkspace.shared.frontmostApplication else {
-            return false
-        }
-        
-        let axApp = AxApplication(element: AXUIElementCreateApplication(app.processIdentifier))
-        guard let window = try? axApp.focusedWindow(),
-              let frame = try? window.frame(),
-              let mainScreen = NSScreen.main else {
-            return false
-        }
-        
-        return mainScreen.frame.intersects(frame)
     }
     
     deinit {

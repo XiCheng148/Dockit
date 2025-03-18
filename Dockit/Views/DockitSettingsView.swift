@@ -86,7 +86,6 @@ struct DockitSettingsView: View {
     @State private var hasAccessibility: Bool = false
     @State private var showingRestartAlert: Bool = false
     @State private var cancellables = Set<AnyCancellable>()
-    @State private var showPreview: Bool = true
     
     @ObservedObject private var manager = DockitManager.shared
     
@@ -228,7 +227,7 @@ struct DockitSettingsView: View {
             
             Section(header: Text("预览选项").font(.headline)) {
                 HStack(spacing: 4) {
-                    Toggle("显示停靠预览", isOn: $showPreview)
+                    Toggle("显示停靠预览", isOn: $manager.showPreview)
                         .onHover { hovering in
                             if hovering {
                                 NSCursor.pointingHand.push()
