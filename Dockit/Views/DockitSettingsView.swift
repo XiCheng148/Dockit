@@ -91,11 +91,13 @@ struct DockitSettingsView: View {
     
     var body: some View {
         Form {
-            Section {
+            Section(header: Text("基础设置").font(.headline)) {
                 HStack(spacing: 4) {
                     Text("辅助功能权限")
                     HelpIcon(text: "需要此权限来管理窗口位置")
-                    StatusIndicator(isEnabled: hasAccessibility)
+                    Circle()
+                        .fill(hasAccessibility ? Color.green : Color.red)
+                        .frame(width: 8, height: 8)
                     Spacer()
                     if !hasAccessibility {
                         Button("授权") {
@@ -112,9 +114,6 @@ struct DockitSettingsView: View {
                         }
                     }
                 }
-            }
-            
-            Section {
                 HStack(spacing: 4) {
                     Toggle("启用停靠", isOn: $manager.isEnabled)
                         .onHover { hovering in
@@ -137,13 +136,27 @@ struct DockitSettingsView: View {
                         }
                 }
             }
+
+            Section(header: Text("预览设置").font(.headline)) {
+                LabeledContent {
+                    Toggle("", isOn: $manager.showPreview)
+                        .toggleStyle(.switch)
+                        .onHover { hovering in
+                            if hovering {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
+                        }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("显示停靠预览")
+                        HelpIcon(text: "显示窗口停靠时的动画预览")
+                    }
+                }
+            }
             
             Section(header: Text("高级设置").font(.headline)) {
-                Text("当前版本仅支持在主屏幕上停靠窗口")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 8)
-                
                 SliderWithTextField(
                     title: "露出宽度",
                     helpText: "停靠时窗口露出的宽度",
@@ -161,10 +174,10 @@ struct DockitSettingsView: View {
                 LabeledContent {
                     Picker("", selection: $manager.fps) {
                         ForEach([
-                            (4.0, "节能"),
-                            (10.0, "平衡"),
-                            (30.0, "流畅"),
-                            (60.0, "丝滑")
+                            (4, "节能"),
+                            (10, "平衡"),
+                            (30, "流畅"),
+                            (60, "丝滑")
                         ], id: \.0) { fps, label in
                             Text(label)
                                 .tag(fps)
@@ -224,22 +237,10 @@ struct DockitSettingsView: View {
                 }
                 .help("取消所有已停靠的窗口")
             }
-            
-            Section(header: Text("预览选项").font(.headline)) {
-                HStack(spacing: 4) {
-                    Toggle("显示停靠预览", isOn: $manager.showPreview)
-                        .onHover { hovering in
-                            if hovering {
-                                NSCursor.pointingHand.push()
-                            } else {
-                                NSCursor.pop()
-                            }
-                        }
-                    HelpIcon(text: "显示窗口停靠时的动画预览")
-                }
-            }
+
         }
         .formStyle(.grouped)
+        .background(.background)
         .fixedSize()
         .onAppear {
             setupAccessibilityMonitoring()
@@ -259,6 +260,10 @@ struct DockitSettingsView: View {
         } message: {
             Text("已获得辅助功能权限，需要重启应用才能生效。")
         }
+        Text("当前版本仅支持在主屏幕上停靠窗口")
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .padding(.bottom, 8)
     }
     
     private func activateWindow() {
@@ -298,3 +303,7 @@ struct DockitSettingsView: View {
         NSApp.terminate(nil)
     }
 } 
+
+#Preview {
+    DockitSettingsView()
+}

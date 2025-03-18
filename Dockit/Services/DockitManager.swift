@@ -1,7 +1,6 @@
 import AppKit
 import Foundation
 import SwiftUI
-import Defaults
 
 class DockitManager: ObservableObject {
     static let shared = DockitManager()
@@ -18,246 +17,101 @@ class DockitManager: ObservableObject {
         }
     }
     
-    @Published private var _exposedPixels: Double
+    // 服务依赖
+    private let prefsManager = PreferencesManager.shared
+    private let windowService = WindowDockingService.shared
+    private let spaceService = SpaceMonitorService.shared
+    private let eventMonitor = DockitEventMonitor()
+    
+    // 对外暴露设置属性的访问器
     var exposedPixels: Double {
-        get { _exposedPixels }
-        set {
-            _exposedPixels = newValue
-            Defaults[.exposedPixels] = Int(newValue)
-            // 当设置改变时更新所有已停靠窗口
-            dockedWindows.forEach { window in
+        get { prefsManager.exposedPixels }
+        set { prefsManager.updateExposedPixels(newValue) }
+    }
+    
+    var triggerAreaWidth: Double {
+        get { prefsManager.triggerAreaWidth }
+        set { prefsManager.updateTriggerAreaWidth(newValue) }
+    }
+    
+    var isEnabled: Bool {
+        get { prefsManager.isEnabled }
+        set { prefsManager.updateIsEnabled(newValue) }
+    }
+    
+    var respectSpaces: Bool {
+        get { prefsManager.respectSpaces }
+        set { prefsManager.updateRespectSpaces(newValue) }
+    }
+    
+    var fps: Int {
+        get { prefsManager.fps }
+        set { prefsManager.updateFps(newValue) }
+    }
+    
+    var notchStyle: String {
+        get { prefsManager.notchStyle }
+        set { prefsManager.updateNotchStyle(newValue) }
+    }
+    
+    var showPreview: Bool {
+        get { prefsManager.showPreview }
+        set { prefsManager.updateShowPreview(newValue) }
+    }
+    
+    private init() {
+        // 设置回调
+        setupCallbacks()
+    }
+    
+    private func setupCallbacks() {
+        // 设置偏好回调
+        prefsManager.onExposedPixelsChanged = { [weak self] newValue in
+            self?.dockedWindows.forEach { window in
                 window.axWindow.dockTo(window.edge, exposedPixels: newValue)
             }
         }
-    }
-    
-    @Published private var _triggerAreaWidth: Double
-    var triggerAreaWidth: Double {
-        get { _triggerAreaWidth }
-        set {
-            _triggerAreaWidth = newValue
-            Defaults[.triggerAreaWidth] = Int(newValue)
-        }
-    }
-    
-    @Published private var _isEnabled: Bool
-    var isEnabled: Bool {
-        get { _isEnabled }
-        set {
-            _isEnabled = newValue
-            Defaults[.isEnabled] = newValue
-            if !newValue {
-                undockAllWindows()
+        
+        prefsManager.onIsEnabledChanged = { [weak self] isEnabled in
+            if !isEnabled {
+                self?.undockAllWindows()
             }
         }
-    }
-    
-    @Published private var _respectSpaces: Bool
-    var respectSpaces: Bool {
-        get { _respectSpaces }
-        set {
-            _respectSpaces = newValue
-            Defaults[.respectSpaces] = newValue
-        }
-    }
-    
-    @Published private var _fps: Int
-    var fps: Int {
-        get { _fps }
-        set {
-            _fps = newValue
-            Defaults[.fps] = newValue
-            eventMonitor.updateFPS(newValue)
-        }
-    }
-    
-    @Published private var _notchStyle: String
-    var notchStyle: String {
-        get { _notchStyle }
-        set {
-            _notchStyle = newValue
-            Defaults[.notchStyle] = newValue
-        }
-    }
-    
-    @Published private var _showPreview: Bool
-    var showPreview: Bool {
-        get { _showPreview }
-        set {
-            _showPreview = newValue
-            Defaults[.showPreview] = newValue
-        }
-    }
-    
-    private let eventMonitor = DockitEventMonitor()
-    
-    private var workspaceNotificationObserver: NSObjectProtocol?
-    
-    private init() {
-        self._exposedPixels = Double(Defaults[.exposedPixels])
-        self._triggerAreaWidth = Double(Defaults[.triggerAreaWidth])
-        self._isEnabled = Defaults[.isEnabled]
-        self._respectSpaces = Defaults[.respectSpaces]
-        self._fps = Defaults[.fps]
-        self._notchStyle = Defaults[.notchStyle]
-        self._showPreview = Defaults[.showPreview]
         
-        DockitLogger.shared.logInfo("DockitManager 初始化 - 露出像素: \(exposedPixels)px, 触发区域宽度: \(triggerAreaWidth)px")
+        prefsManager.onFpsChanged = { [weak self] fps in
+            self?.eventMonitor.updateFPS(fps)
+        }
         
-        // 添加工作区切换监听
-        workspaceNotificationObserver = NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.activeSpaceDidChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
+        // 设置窗口服务回调
+        windowService.onWindowDocked = { [weak self] dockedWindow in
+            guard let self = self else { return }
+            
+            // 检查窗口是否已经停靠
+            if let existingWindowIndex = self.dockedWindows.firstIndex(where: { $0.axWindow == dockedWindow.axWindow }) {
+                // 如果已停靠且边缘相同，则忽略
+                if self.dockedWindows[existingWindowIndex].edge == dockedWindow.edge {
+                    DockitLogger.shared.logInfo("窗口已经停靠在\(dockedWindow.edge == .left ? "左" : "右")边")
+                    return
+                }
+                // 如果已停靠但边缘不同，则先取消停靠
+                self.dockedWindows.remove(at: existingWindowIndex)
+            }
+            
+            self.dockedWindows.append(dockedWindow)
+        }
+        
+        windowService.onWindowUndocked = { [weak self] id, reason in
+            self?.dockedWindows.removeAll { $0.id == id }
+        }
+        
+        windowService.onAllWindowsUndocked = { [weak self] in
+            self?.dockedWindows.removeAll()
+        }
+        
+        // 设置空间切换回调
+        spaceService.onSpaceChanged = { [weak self] in
             self?.handleSpaceChange()
         }
-    }
-    
-    func dockWindow(_ axWindow: AxWindow, to edge: DockEdge) {
-        guard isEnabled else {
-            DockitLogger.shared.logInfo("Dockit 已禁用")
-            return
-        }
-        
-        // 检查窗口是否已经停靠
-        if let existingWindow = dockedWindows.first(where: { $0.axWindow == axWindow }) {
-            // 如果已停靠且边缘相同，则忽略
-            if existingWindow.edge == edge {
-                DockitLogger.shared.logInfo("窗口已经停靠在\(edge == .left ? "左" : "右")边")
-                return
-            }
-            // 如果已停靠但边缘不同，则先取消停靠
-            undockWindow(existingWindow.id)
-        }
-        
-        setupEventMonitor()
-        
-        guard let app = NSWorkspace.shared.frontmostApplication,
-              let window = Windows.shared.inner.first(where: { $0.axWindow == axWindow }) else {
-            DockitLogger.shared.logError("无法获取应用或窗口信息")
-            NotificationHelper.show(
-                type: .warning,
-                title: "无法获取前台窗口"
-            )
-            return
-        }
-        
-        let dockedWindow = DockedWindow(axWindow: axWindow, edge: edge)
-        dockedWindows.append(dockedWindow)
-        
-        DockitLogger.shared.logWindowDocked(
-            try? axWindow.title(),
-            edge: edge,
-            frame: try? axWindow.frame()
-        )
-        
-        NotificationHelper.show(
-            type: .custom(edge == .left ? "arrowshape.left.fill" : "arrowshape.right.fill"),
-            title: try! axWindow.title() ?? "",
-            description: "已停靠到\(edge == .left ? "左" : "右")边",
-            windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
-        )
-        
-        axWindow.dockTo(edge, exposedPixels: exposedPixels)
-    }
-    
-    func undockWindow(_ id: UUID, reason: UndockReason = .userAction) {
-        guard let window = dockedWindows.first(where: { $0.id == id }) else { return }
-        
-        // 如果是窗口关闭，就不要尝试获取窗口信息了
-        if reason != .windowClosed {
-            DockitLogger.shared.logWindowUndocked(
-                try? window.axWindow.title(),
-                reason: reason,
-                frame: try? window.axWindow.frame()
-            )
-        } else {
-            DockitLogger.shared.logWindowUndocked(
-                "未知窗口",  // 窗口关闭时使用默认标题
-                reason: reason,
-                frame: nil
-            )
-        }
-
-        if let observer = window.observer {
-            CFRunLoopRemoveSource(
-                CFRunLoopGetCurrent(),
-                AXObserverGetRunLoopSource(observer),
-                .defaultMode
-            )
-        }
-        
-        // 先移除窗口，再发送通知
-        dockedWindows.removeAll { $0.id == id }
-        
-        // 安全地获取窗口标题
-        let windowTitle = (try? window.axWindow.title()) ?? "未知窗口"
-        
-       NotificationHelper.show(
-           type: .success,
-           title: windowTitle,
-           description: "已取消停靠",
-           windowIcon: NotificationHelper.getAppIconForWindow(window.axWindow)
-       )
-    }
-    
-    func undockAllWindows(type: UndockAllWindowsType = .normal) {
-        DockitLogger.shared.logUndockAllShortcut()
-        // 先检查是不是空的
-        if dockedWindows.isEmpty {
-            DockitLogger.shared.logInfo("没有停靠的窗口")
-            if type == .normal {
-               NotificationHelper.show(
-                   type: .warning,
-                   title: "没有停靠的窗口"
-               )
-            }
-            return
-        }
-        
-        dockedWindows.forEach { window in
-            DockitLogger.shared.logWindowUndocked(
-                try? window.axWindow.title(),
-                reason: .userAction,
-                frame: window.originalFrame
-            )
-            
-            // 获取所有屏幕
-            let screens = NSScreen.screens
-            var targetFrame = window.originalFrame
-            
-            // 检查原始位置是否大部分在所有屏幕外
-            let isLargelyOffscreen = window.originalFrame.isLargelyOffscreen(threshold: 0.3)
-            
-            if isLargelyOffscreen {
-                // 如果窗口大部分在屏幕外，将其移动到当前屏幕或主屏幕中央
-                if let currentScreen = NSScreen.mostIntersecting(with: window.originalFrame) ?? NSScreen.main {
-                    let screenCenter = CGPoint(
-                        x: currentScreen.frame.midX - (window.originalFrame.width / 2),
-                        y: currentScreen.frame.midY - (window.originalFrame.height / 2)
-                    )
-                    targetFrame.origin = screenCenter
-                    
-                    DockitLogger.shared.logInfo("窗口 \(try? window.axWindow.title() ?? "") 原位置在屏幕外，已移至\(currentScreen == NSScreen.main ? "主" : "当前")屏幕中央")
-                }
-            }
-            
-            // 在设置位置前先focus窗口
-            if let windowToFocus = Windows.shared.inner.first(where: { $0.axWindow == window.axWindow }) {
-                windowToFocus.focus()
-                DockitLogger.shared.logInfo("已激活窗口 \(try? window.axWindow.title() ?? "")")
-            }
-            
-            try? window.axWindow.setPosition(targetFrame.origin)
-        }
-        
-        dockedWindows.removeAll()
-        
-       NotificationHelper.show(
-           type: .success,
-           title: "已取消停靠所有窗口"
-       )
     }
     
     private func setupEventMonitor() {
@@ -266,7 +120,29 @@ class DockitManager: ObservableObject {
         }
     }
     
-    func handleMouseMovement(_ point: NSPoint) {
+    // MARK: - 公共方法
+    
+    func dockWindow(_ axWindow: AxWindow, to edge: DockEdge) {
+        windowService.dockWindow(axWindow, to: edge)
+    }
+    
+    func undockWindow(_ id: UUID, reason: UndockReason = .userAction) {
+        if let window = dockedWindows.first(where: { $0.id == id }) {
+            windowService.undockWindow(window, reason: reason)
+        }
+    }
+    
+    func undockAllWindows(type: UndockAllWindowsType = .normal) {
+        windowService.undockAllWindows(dockedWindows, type: type)
+    }
+    
+    func dockActiveWindow(to edge: DockEdge) {
+        windowService.dockActiveWindow(to: edge)
+    }
+    
+    // MARK: - 私有方法
+    
+    private func handleMouseMovement(_ point: NSPoint) {
         dockedWindows.forEach { dockedWindow in
             // 如果无法获取窗口框架，说明窗口可能已经关闭
             guard let _ = try? dockedWindow.axWindow.frame() else {
@@ -274,7 +150,7 @@ class DockitManager: ObservableObject {
                 return
             }
             
-            let isWindowVisible = isWindowVisibleOnScreen(dockedWindow.axWindow)
+            let isWindowVisible = spaceService.isWindowVisibleOnScreen(dockedWindow.axWindow)
             
             if respectSpaces && !isWindowVisible {
                 return
@@ -322,59 +198,13 @@ class DockitManager: ObservableObject {
         }
     }
     
-    private func isWindowVisibleOnScreen(_ window: AxWindow) -> Bool {
-        guard let frame = try? window.frame() else {
-            DockitLogger.shared.logError("无法获取窗口框架")
-            return false
-        }
-        
-        let screens = NSScreen.screens
-        
-        for screen in screens {
-            if screen.frame.intersects(frame) {
-                if let windowId = try? window.cgWindowId(),
-                   let windowList = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[CFString: Any]] {
-                    let isVisible = windowList.contains { dict in
-                        if let id = dict[kCGWindowNumber] as? CGWindowID {
-                            return id == windowId
-                        }
-                        return false
-                    }
-                    if !isVisible {
-                        DockitLogger.shared.logInfo("窗口不在当前工作区")
-                    }
-                    return isVisible
-                } else {
-                    DockitLogger.shared.logError("无法获取窗口ID或窗口列表")
-                }
-            }
-        }
-        
-        return false
-    }
-    
-    func dockActiveWindow(to edge: DockEdge) {
-        guard let app = NSWorkspace.shared.frontmostApplication else {
-            DockitLogger.shared.logError("无法获取当前活动应用")
-            return
-        }
-        
-        let axApp = AxApplication(element: AXUIElementCreateApplication(app.processIdentifier))
-        guard let window = try? axApp.focusedWindow() else {
-            DockitLogger.shared.logError("无法获取当前焦点窗口")
-            return
-        }
-        
-        dockWindow(window, to: edge)
-    }
-    
     private func handleSpaceChange() {
         // 遍历所有已停靠的窗口
         dockedWindows.forEach { dockedWindow in
             // 如果窗口当前是展开状态
             if dockedWindow.isVisible {
                 // 检查窗口是否在当前空间可见
-                let isVisible = isWindowVisibleOnScreen(dockedWindow.axWindow)
+                let isVisible = spaceService.isWindowVisibleOnScreen(dockedWindow.axWindow)
                 if !isVisible {
                     // 如果窗口不在当前空间，则收起窗口
                     if let index = dockedWindows.firstIndex(where: { $0.id == dockedWindow.id }) {
@@ -387,12 +217,6 @@ class DockitManager: ObservableObject {
                     }
                 }
             }
-        }
-    }
-    
-    deinit {
-        if let observer = workspaceNotificationObserver {
-            NSWorkspace.shared.notificationCenter.removeObserver(observer)
         }
     }
 } 
