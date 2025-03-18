@@ -115,25 +115,25 @@ struct DockedWindow: Identifiable {
     
     var triggerArea: CGRect {
         guard let currentFrame = try? axWindow.frame(),
-              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) else { return .zero }
+              let screen = NSScreen.containing(currentFrame) ?? NSScreen.main else { return .zero }
         
         let width = DockitManager.shared.triggerAreaWidth
         
-        // 将窗口坐标转换为相对于当前屏幕的 Cocoa 坐标系
-        let y = screen.frame.maxY - currentFrame.maxY
+        // 使用统一的坐标转换方法
+        let windowInFlippedCoords = currentFrame.convert(from: .accessibility, to: .flipped, in: screen)
         
         switch edge {
         case .left:
             return CGRect(
                 x: screen.frame.minX,
-                y: y,
+                y: windowInFlippedCoords.origin.y,
                 width: width,
                 height: currentFrame.height
             )
         case .right:
             return CGRect(
                 x: screen.frame.maxX - width,
-                y: y,
+                y: windowInFlippedCoords.origin.y,
                 width: width,
                 height: currentFrame.height
             )
@@ -142,14 +142,14 @@ struct DockedWindow: Identifiable {
     
     var windowArea: CGRect {
         guard let currentFrame = try? axWindow.frame(),
-              let screen = NSScreen.screens.first(where: { $0.frame.intersects(currentFrame) }) else { return .zero }
+              let screen = NSScreen.containing(currentFrame) ?? NSScreen.main else { return .zero }
         
-        // 将窗口坐标转换为相对于当前屏幕的 Cocoa 坐标系
-        let y = screen.frame.maxY - currentFrame.maxY
+        // 使用统一的坐标转换方法
+        let windowInFlippedCoords = currentFrame.convert(from: .accessibility, to: .flipped, in: screen)
         
         return CGRect(
             x: currentFrame.origin.x,
-            y: y,
+            y: windowInFlippedCoords.origin.y,
             width: currentFrame.width,
             height: currentFrame.height
         )

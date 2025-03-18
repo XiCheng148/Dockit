@@ -51,10 +51,12 @@ extension AxWindow {
             DockitLogger.shared.logInfo("窗口不在主屏幕上，将被移动至主屏幕")
             
             // 将窗口移动到主屏幕中心
-            let centerX = mainScreen.frame.midX - (currentFrame.width / 2)
-            let centerY = mainScreen.frame.midY - (currentFrame.height / 2)
+            let centerPoint = CGPoint(
+                x: mainScreen.frame.midX - (currentFrame.width / 2),
+                y: mainScreen.frame.midY - (currentFrame.height / 2)
+            )
             
-            try? setPosition(CGPoint(x: centerX, y: centerY))
+            try? setPosition(centerPoint)
         }
         
         let newPosition = WindowPositionCalculator.calculateCollapsedPosition(

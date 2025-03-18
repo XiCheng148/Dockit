@@ -52,21 +52,11 @@ class DockPreviewController {
     }
     
     private func createPreviewWindow(initialFrame: CGRect, targetFrame: CGRect) {
-        let screenFrame = NSScreen.main?.frame ?? NSScreen.screens.first!.frame
+        guard let mainScreen = NSScreen.main else { return }
         
-        let convertedInitialFrame = CGRect(
-            x: initialFrame.origin.x,
-            y: screenFrame.height - initialFrame.origin.y - initialFrame.height,
-            width: initialFrame.width,
-            height: initialFrame.height
-        )
-        
-        let convertedTargetFrame = CGRect(
-            x: targetFrame.origin.x,
-            y: screenFrame.height - targetFrame.origin.y - targetFrame.height,
-            width: targetFrame.width,
-            height: targetFrame.height
-        )
+        // 使用统一的坐标转换方法
+        let convertedInitialFrame = initialFrame.convert(from: .accessibility, to: .flipped, in: mainScreen)
+        let convertedTargetFrame = targetFrame.convert(from: .accessibility, to: .flipped, in: mainScreen)
         
         autoreleasepool {
             let panel = NSPanel(

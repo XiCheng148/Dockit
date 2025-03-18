@@ -232,16 +232,11 @@ class DockitManager: ObservableObject {
             var targetFrame = window.originalFrame
             
             // 检查原始位置是否大部分在所有屏幕外
-            let isLargelyOffscreen = screens.allSatisfy { screen in
-                let intersection = screen.frame.intersection(window.originalFrame)
-                let visibleArea = intersection.width * intersection.height
-                let totalArea = window.originalFrame.width * window.originalFrame.height
-                return visibleArea / totalArea < 0.3 // 如果可见面积小于30%，认为是大部分在屏幕外
-            }
+            let isLargelyOffscreen = window.originalFrame.isLargelyOffscreen(threshold: 0.3)
             
             if isLargelyOffscreen {
                 // 如果窗口大部分在屏幕外，将其移动到当前屏幕或主屏幕中央
-                if let currentScreen = NSScreen.screens.first(where: { $0.frame.intersects(window.originalFrame) }) ?? NSScreen.main {
+                if let currentScreen = NSScreen.mostIntersecting(with: window.originalFrame) ?? NSScreen.main {
                     let screenCenter = CGPoint(
                         x: currentScreen.frame.midX - (window.originalFrame.width / 2),
                         y: currentScreen.frame.midY - (window.originalFrame.height / 2)
