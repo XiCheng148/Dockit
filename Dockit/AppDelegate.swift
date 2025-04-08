@@ -48,7 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let svgPath = Bundle.main.path(forResource: "menubar-icon", ofType: "svg"),
                let svgData = try? Data(contentsOf: URL(fileURLWithPath: svgPath)) {
                 if let image = NSImage(data: svgData) {
-                    image.size = NSSize(width: 16, height: 12)
+                    image.size = NSSize(width: 26, height: 24)
                     // image.isTemplate = true  // 这会让图标自动适应系统主题色
                     
                     // 保持原始比例
