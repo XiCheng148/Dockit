@@ -49,7 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                let svgData = try? Data(contentsOf: URL(fileURLWithPath: svgPath)) {
                 if let image = NSImage(data: svgData) {
                     image.size = NSSize(width: 26, height: 24)
-                    // image.isTemplate = true  // 这会让图标自动适应系统主题色
+                    image.isTemplate = true  // 这会让图标自动适应系统主题色
                     
                     // 保持原始比例
                     button.image = image
