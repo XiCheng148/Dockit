@@ -1,106 +1,32 @@
-name: Build Release DMG
+name: CI
 
 on:
   push:
-    tags:
-      - 'v*'
+      branches: [develop]
+  pull_request:
+      branches: [develop]
 
 jobs:
   build:
-    name: Build and Create DMG
-    runs-on: macos-latest
-
-    permissions:
-      contents: write
-
+    strategy:
+      matrix:
+        include:
+          - xcode: "16.1"
+            deployment_target: ""
+    runs-on:  macos-15
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Get Project Name
-        id: project_name
-        run: |
-          PROJECT_FILE=$(find . -maxdepth 1 -name '*.xcodeproj' -print -quit)
-          if [ -z "$PROJECT_FILE" ]; then
-            echo "Error: No .xcodeproj file found in the root directory."
-            exit 1
-          fi
-          echo "name=$(basename "$PROJECT_FILE" .xcodeproj)" >> $GITHUB_OUTPUT
-
-      - name: Get App Name (Scheme Name)
-        id: app_name
-        run: echo "name=${{ steps.project_name.outputs.name }}" >> $GITHUB_OUTPUT
-
-      - name: Select Xcode version
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.0'
-
-      - name: Build Application
-        run: |
-          xcodebuild build -scheme "${{ steps.app_name.outputs.name }}" \
-                         -project "${{ steps.project_name.outputs.name }}.xcodeproj" \
-                         -configuration Release \
-                         -derivedDataPath ./build \
-                         CODE_SIGN_IDENTITY="" \
-                         CODE_SIGNING_REQUIRED=NO
-
-      - name: Find .app path
-        id: find_app
-        run: |
-          APP_PATH=$(find ./build/Build/Products/Release -name "*.app" -print -quit)
-          if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
-            echo "Error: Built .app bundle not found in ./build/Build/Products/Release/"
-            exit 1
-          fi
-          echo "path=$APP_PATH" >> $GITHUB_OUTPUT
-          echo "Found .app at: $APP_PATH"
-
-      - name: Install create-dmg
-        run: brew install create-dmg
-
-      - name: Create DMG
-        run: |
-          APP_NAME="${{ steps.app_name.outputs.name }}"
-          APP_PATH="${{ steps.find_app.outputs.path }}"
-          # 使用标签名作为版本号，例如 Dockit-v1.0.0.dmg
-          DMG_NAME="${APP_NAME}-${GITHUB_REF_NAME}.dmg"
-
-          echo "Creating DMG: $DMG_NAME from $APP_PATH"
-
-          # 确保 Assets.xcassets/AppIcon.appiconset/icon_512x512.png 存在，或者替换为实际图标路径
-          # 如果没有图标，可以移除 --icon 参数
-          # 图标路径相对于 create-dmg 命令执行的目录（项目根目录）
-          ICON_PATH="Dockit/Assets.xcassets/AppIcon.appiconset/icon_512x512.png"
-          if [ ! -f "$ICON_PATH" ]; then
-            echo "Warning: Icon file not found at $ICON_PATH. DMG will be created without a custom icon for the app."
-            create-dmg \
-              --volname "$APP_NAME ${GITHUB_REF_NAME}" \
-              --window-pos 200 120 \
-              --window-size 600 400 \
-              --icon-size 100 \
-              --hide-extension "$APP_NAME.app" \
-              --app-drop-link 425 120 \
-              "$DMG_NAME" \
-              "$APP_PATH"
-          else
-            echo "Using icon at: $ICON_PATH"
-            create-dmg \
-              --volname "$APP_NAME ${GITHUB_REF_NAME}" \
-              --window-pos 200 120 \
-              --window-size 600 400 \
-              --icon-size 100 \
-              --icon "$APP_NAME.app" 175 120 \
-              --hide-extension "$APP_NAME.app" \
-              --app-drop-link 425 120 \
-              "$DMG_NAME" \
-              "$APP_PATH" \
-              --icon "$ICON_PATH" 0 0 # Optional: Add volume icon
-          fi
-
-      - name: Create Release and Upload DMG
-        uses: softprops/action-gh-release@v2
-        with:
-          files: "*.dmg"
+      - name: Build
+        run: xcodebuild -project Dockit.xcodeproj ONLY_ACTIVE_ARCH=NO -scheme Dockit -configuration Nightly ${{ matrix.deployment_target }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
+
+      - name: Archive
+        run: tar cvJf ~/Dockit.tar.xz -C /Users/runner/Library/Developer/Xcode/DerivedData/Dockit-csbkugdtxazzqogjnydbothqrvib/Build/Products/Nightly Dockit.app 
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dockit
+          path: ~/Dockit.tar.xz
