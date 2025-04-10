@@ -16,6 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clean Caches
+        run: |
+          echo "Cleaning SPM cache..."
+          rm -rf ~/Library/Caches/org.swift.swiftpm
+          echo "Cleaning DerivedData..."
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          echo "Cache cleaning complete."
+
       - name: Build
         run: xcodebuild -project Dockit.xcodeproj ONLY_ACTIVE_ARCH=NO -scheme Dockit -configuration Nightly ${{ matrix.deployment_target }}
         env:
