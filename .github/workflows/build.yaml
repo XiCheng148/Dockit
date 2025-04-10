@@ -31,6 +31,11 @@ jobs:
         id: app_name
         run: echo "name=${{ steps.project_name.outputs.name }}" >> $GITHUB_OUTPUT
 
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.0'
+
       - name: Build Application
         run: |
           xcodebuild build -scheme "${{ steps.app_name.outputs.name }}" \
