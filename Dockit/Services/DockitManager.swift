@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import SwiftUI
+import Defaults
 
 class DockitManager: ObservableObject {
     static let shared = DockitManager()
@@ -150,6 +151,10 @@ class DockitManager: ObservableObject {
     // MARK: - 私有方法
     
     private func handleMouseMovement(_ point: NSPoint) {
+        let currentModifiers = NSEvent.modifierFlags
+        let expandModifiers = NSEvent.ModifierFlags(rawValue: prefsManager.expandModifiers)
+        let collapseModifiers = NSEvent.ModifierFlags(rawValue: prefsManager.collapseModifiers)
+        
         dockedWindows.forEach { dockedWindow in
             // 如果无法获取窗口框架，说明窗口可能已经关闭
             guard let _ = try? dockedWindow.axWindow.frame() else {
@@ -163,15 +168,38 @@ class DockitManager: ObservableObject {
                 return
             }
             
-            // 检查是否所有其他窗口都是隐藏状态
             let allOtherWindowsHidden = dockedWindows
-                .filter { $0.id != dockedWindow.id }  // 排除当前窗口
-                .allSatisfy { !$0.isVisible }         // 检查是否都是隐藏状态
+                .filter { $0.id != dockedWindow.id }
+                .allSatisfy { !$0.isVisible }
             
-            let shouldShow = dockedWindow.isVisible 
-                ? dockedWindow.windowArea.contains(point)
-                : (dockedWindow.triggerArea.contains(point) && allOtherWindowsHidden)
-                
+            // 重构展开/收起逻辑
+            var shouldShow = dockedWindow.isVisible
+            
+            if dockedWindow.isVisible {
+                // 窗口已展开，检查是否需要收起
+                if !dockedWindow.windowArea.contains(point) {
+                    if collapseModifiers.isEmpty {
+                        // 没有设置收起触发键，直接收起
+                        shouldShow = false
+                    } else if currentModifiers == collapseModifiers {
+                        // 设置了收起触发键，且按下了正确的触发键，才收起
+                        shouldShow = false
+                    }
+                }
+            } else {
+                // 窗口已收起，检查是否需要展开
+                if dockedWindow.triggerArea.contains(point) && allOtherWindowsHidden {
+                    if expandModifiers.isEmpty {
+                        // 没有设置展开触发键，直接展开
+                        shouldShow = true
+                    } else if currentModifiers == expandModifiers {
+                        // 设置了展开触发键，且按下了正确的触发键，才展开
+                        shouldShow = true
+                    }
+                }
+            }
+            
+            // 状态发生变化时才执行展开/收起操作
             if shouldShow != dockedWindow.isVisible {
                 var updatedWindow = dockedWindow
                 updatedWindow.isVisible = shouldShow
@@ -196,7 +224,6 @@ class DockitManager: ObservableObject {
                     if let window = Windows.shared.inner.first(where: { $0.axWindow == dockedWindow.axWindow }) {
                         window.focus()
                     }
-                    
                     dockedWindow.axWindow.expandTo(dockedWindow.edge)
                 } else {
                     dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)

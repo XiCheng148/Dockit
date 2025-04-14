@@ -2,6 +2,8 @@ import SwiftUI
 import Combine
 import KeyboardShortcuts
 import LaunchAtLogin
+import Defaults
+import AppKit
 
 struct HelpIcon: View {
     let text: String
@@ -236,6 +238,24 @@ struct DockitSettingsView: View {
                         }
                 }
                 .help("取消所有已停靠的窗口")
+                
+                ModifierKeysSelector(
+                    title: "展开触发键",
+                    selection: Binding(
+                        get: { Defaults[.expandModifiers] },
+                        set: { Defaults[.expandModifiers] = $0 }
+                    )
+                )
+                .help("按住此键并移动鼠标到屏幕边缘时展开窗口")
+                
+                ModifierKeysSelector(
+                    title: "收起触发键",
+                    selection: Binding(
+                        get: { Defaults[.collapseModifiers] },
+                        set: { Defaults[.collapseModifiers] = $0 }
+                    )
+                )
+                .help("按住此键并移动鼠标离开窗口时收起窗口")
             }
 
         }

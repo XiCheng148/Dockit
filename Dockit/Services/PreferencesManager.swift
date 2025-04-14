@@ -1,6 +1,7 @@
 import Foundation
 import Defaults
 import SwiftUI
+import AppKit
 
 class PreferencesManager: ObservableObject {
     static let shared = PreferencesManager()
@@ -74,5 +75,23 @@ class PreferencesManager: ObservableObject {
         showPreview = value
         Defaults[.showPreview] = value
         onShowPreviewChanged?(value)
+    }
+    
+    var expandModifiers: UInt {
+        get { Defaults[.expandModifiers] }
+        set { Defaults[.expandModifiers] = newValue }
+    }
+    
+    var collapseModifiers: UInt {
+        get { Defaults[.collapseModifiers] }
+        set { Defaults[.collapseModifiers] = newValue }
+    }
+    
+    func updateExpandModifiers(_ modifiers: NSEvent.ModifierFlags) {
+        Defaults[.expandModifiers] = modifiers.rawValue
+    }
+    
+    func updateCollapseModifiers(_ modifiers: NSEvent.ModifierFlags) {
+        Defaults[.collapseModifiers] = modifiers.rawValue
     }
 } 

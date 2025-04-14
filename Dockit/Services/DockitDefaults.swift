@@ -1,5 +1,6 @@
 import Defaults
 import Foundation
+import AppKit
 
 extension Defaults.Keys {
     static let exposedPixels = Key<Int>("exposedPixels", default: 10)
@@ -11,4 +12,7 @@ extension Defaults.Keys {
     static let showPreview = Key<Bool>("showPreview", default: true)
     // 添加通知样式设置
     static let notchStyle = Key<String>("notchStyle", default: "auto")
+    // 将 ModifierFlags 存储为原始整数值
+    static let expandModifiers = Key<UInt>("expandModifiers", default: 0)
+    static let collapseModifiers = Key<UInt>("collapseModifiers", default: 0)
 } 
