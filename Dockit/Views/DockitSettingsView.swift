@@ -41,6 +41,7 @@ struct SliderWithTextField: View {
     @Binding var value: Double
     
     @State private var tempValue: String = ""
+    @State private var isInvalidInput: Bool = false
     
     var numberFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -52,7 +53,13 @@ struct SliderWithTextField: View {
     var body: some View {
         LabeledContent {
             HStack(spacing: 8) {
-                Slider(value: $value, in: range)
+                Slider(value: Binding(
+                    get: { value },
+                    set: { newValue in
+                        value = newValue
+                        tempValue = numberFormatter.string(from: NSNumber(value: newValue)) ?? ""
+                    }
+                ), in: range)
                     .frame(width: 100)
                     .help("\(Int(range.lowerBound))～\(Int(range.upperBound))")
                 
@@ -63,17 +70,36 @@ struct SliderWithTextField: View {
                     .onAppear {
                         tempValue = numberFormatter.string(from: NSNumber(value: value)) ?? ""
                     }
-                    .onChange(of: value) { newValue in
-                        tempValue = numberFormatter.string(from: NSNumber(value: newValue)) ?? ""
-                    }
                     .onChange(of: tempValue) { newValue in
+                        // 检查输入是否为有效数字
                         if let numberValue = numberFormatter.number(from: newValue)?.doubleValue {
-                            value = min(max(numberValue, range.lowerBound), range.upperBound)
+                            let clampedValue = min(max(numberValue, range.lowerBound), range.upperBound)
+                            
+                            // 如果输入值超出范围，显示警告状态
+                            isInvalidInput = numberValue < range.lowerBound || numberValue > range.upperBound
+                            
+                            if clampedValue != value {
+                                value = clampedValue
+                                // 更新显示的值为实际应用的值
+                                if isInvalidInput {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                        tempValue = numberFormatter.string(from: NSNumber(value: clampedValue)) ?? ""
+                                        isInvalidInput = false
+                                    }
+                                }
+                            }
+                        } else {
+                            // 输入非数字时显示警告状态
+                            isInvalidInput = true
+                            // 如果输入非法，0.5秒后恢复显示当前值
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                tempValue = numberFormatter.string(from: NSNumber(value: value)) ?? ""
+                                isInvalidInput = false
+                            }
                         }
                     }
-                    .onSubmit {
-                        tempValue = numberFormatter.string(from: NSNumber(value: value)) ?? ""
-                    }
+                    .foregroundColor(isInvalidInput ? .red : .primary)
+                    .help("\(Int(range.lowerBound))～\(Int(range.upperBound))")
             }
         } label: {
             HStack(spacing: 4) {
