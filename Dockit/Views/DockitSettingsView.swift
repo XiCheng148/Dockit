@@ -91,6 +91,9 @@ struct DockitSettingsView: View {
     
     @ObservedObject private var manager = DockitManager.shared
     
+    @State private var expandModifiers: UInt = Defaults[.expandModifiers]
+    @State private var collapseModifiers: UInt = Defaults[.collapseModifiers]
+    
     var body: some View {
         Form {
             Section(header: Text("基础设置").font(.headline)) {
@@ -241,20 +244,20 @@ struct DockitSettingsView: View {
                 
                 ModifierKeysSelector(
                     title: "展开触发键",
-                    selection: Binding(
-                        get: { Defaults[.expandModifiers] },
-                        set: { Defaults[.expandModifiers] = $0 }
-                    )
+                    selection: $expandModifiers
                 )
+                .onChange(of: expandModifiers) { newValue in
+                    Defaults[.expandModifiers] = newValue
+                }
                 .help("按住此键并移动鼠标到屏幕边缘时展开窗口")
                 
                 ModifierKeysSelector(
                     title: "收起触发键",
-                    selection: Binding(
-                        get: { Defaults[.collapseModifiers] },
-                        set: { Defaults[.collapseModifiers] = $0 }
-                    )
+                    selection: $collapseModifiers
                 )
+                .onChange(of: collapseModifiers) { newValue in
+                    Defaults[.collapseModifiers] = newValue
+                }
                 .help("按住此键并移动鼠标离开窗口时收起窗口")
             }
 

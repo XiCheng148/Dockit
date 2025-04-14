@@ -17,10 +17,7 @@ struct ModifierKeysSelector: View {
         HStack {
             Text(title)
             Spacer()
-            Picker("", selection: Binding(
-                get: { selection },
-                set: { selection = $0 }
-            )) {
+            Picker("", selection: $selection) {
                 ForEach(modifierOptions, id: \.0) { option in
                     Text(option.0)
                         .tag(option.1.rawValue)
