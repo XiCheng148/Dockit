@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - xcode: "16.1"
+            deployment_target: ""
+    runs-on:  macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clean Caches
+        run: |
+          echo "Cleaning SPM cache..."
+          rm -rf ~/Library/Caches/org.swift.swiftpm
+          echo "Cleaning DerivedData..."
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          echo "Cache cleaning complete."
+
+      - name: Build
+        run: xcodebuild -project Dockit.xcodeproj ONLY_ACTIVE_ARCH=NO -scheme Dockit -configuration Nightly ${{ matrix.deployment_target }}
+        env:
+          DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
+
+      - name: Archive
+        run: tar cvJf ~/Dockit.tar.xz -C /Users/runner/Library/Developer/Xcode/DerivedData/Dockit-csbkugdtxazzqogjnydbothqrvib/Build/Products/Nightly Dockit.app 
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dockit
+          path: ~/Dockit.tar.xz
