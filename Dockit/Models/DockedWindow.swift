@@ -8,6 +8,7 @@ struct DockedWindow: Identifiable {
     let axWindow: AxWindow
     let edge: DockEdge
     let originalFrame: CGRect
+    let storedTitle: String
     var observer: AXObserver?
     
     var isVisible: Bool = false
@@ -17,6 +18,7 @@ struct DockedWindow: Identifiable {
         self.axWindow = axWindow
         self.edge = edge
         self.originalFrame = (try? axWindow.frame()) ?? .zero
+        self.storedTitle = (try? axWindow.title()) ?? "未知标题"
         addObserver()
     }
     
@@ -31,20 +33,14 @@ struct DockedWindow: Identifiable {
             let manager = DockitManager.shared
             let axWindow = AxWindow(element: element)
             
+            guard let dockedWindow = manager.dockedWindows.first(where: { $0.axWindow == axWindow }) else {
+                return
+            }
+            
             switch notification as String {
             case kAXUIElementDestroyedNotification:
-                // 窗口关闭时取消停靠
-                if let id = manager.dockedWindows.first(where: { $0.axWindow == axWindow })?.id {
-                    // 窗口已关闭，使用安全的方式获取标题
-                    let windowTitle = (try? axWindow.title()) ?? "未知窗口"
-                   NotificationHelper.show(
-                       type: .success,
-                       title: windowTitle,
-                       description: "已取消停靠",
-                       windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
-                   )
-                    manager.undockWindow(id, reason: .windowClosed)
-                }
+                DockitLogger.shared.logInfo("监测到窗口关闭事件，准备取消停靠: \(dockedWindow.storedTitle)")
+                manager.undockWindow(dockedWindow.id, reason: .windowClosed)
                 
             case kAXWindowMovedNotification:
                 if let dockedWindow = manager.dockedWindows.first(where: { $0.axWindow == axWindow }),
@@ -52,7 +48,6 @@ struct DockedWindow: Identifiable {
                    let currentFrame = try? axWindow.frame() {
                     let targetScreen = NSScreen.main!
                     
-                    // 使用新工具类判断是否为正常停靠移动
                     let isNormalDockMovement = WindowPositionCalculator.isCollapsedPosition(
                         window: currentFrame,
                         edge: dockedWindow.edge,
@@ -64,7 +59,6 @@ struct DockedWindow: Identifiable {
                         screen: targetScreen
                     )
                     
-                    // 计算与停靠位置的距离
                     let dockedPosition = WindowPositionCalculator.calculateCollapsedPosition(
                         window: currentFrame,
                         edge: dockedWindow.edge,
@@ -73,19 +67,46 @@ struct DockedWindow: Identifiable {
                     )
                     let distance = abs(currentFrame.origin.x - dockedPosition.x)
                     
-                    // 只有不是正常的停靠移动，且超过阈值时才取消停靠
                     if !isNormalDockMovement && distance > 50 {
                         DockitLogger.shared.logWindowMoved(
-                            try? axWindow.title(),
+                            dockedWindow.storedTitle,
                             distance: distance,
                             frame: try? axWindow.frame()
                         )
-                       NotificationHelper.show(
-                           type: .success,
-                           title: (try? axWindow.title()) ?? "未知窗口",
-                           description: "已取消停靠",
-                           windowIcon: NotificationHelper.getAppIconForWindow(axWindow)
-                       )
+                        manager.undockWindow(dockedWindow.id, reason: .dragDistance)
+                    }
+                }
+                
+            case kAXWindowResizedNotification:
+                // 仅在窗口可见（展开）时处理大小改变
+                if let currentFrame = try? axWindow.frame(), dockedWindow.isVisible {
+                    let targetScreen = NSScreen.main!
+                    
+                    let isNormalDockMovement = WindowPositionCalculator.isCollapsedPosition(
+                        window: currentFrame,
+                        edge: dockedWindow.edge,
+                        screen: targetScreen,
+                        exposedPixels: DockitManager.shared.exposedPixels
+                    ) || WindowPositionCalculator.isExpandedPosition(
+                        window: currentFrame,
+                        edge: dockedWindow.edge,
+                        screen: targetScreen
+                    )
+                    
+                    let dockedPosition = WindowPositionCalculator.calculateCollapsedPosition(
+                        window: currentFrame,
+                        edge: dockedWindow.edge,
+                        screen: targetScreen,
+                        exposedPixels: DockitManager.shared.exposedPixels
+                    )
+                    let distance = abs(currentFrame.origin.x - dockedPosition.x)
+                    
+                    if !isNormalDockMovement && distance > 50 {
+                        DockitLogger.shared.logWindowMoved(
+                            dockedWindow.storedTitle,
+                            distance: distance,
+                            frame: try? axWindow.frame()
+                        )
                         manager.undockWindow(dockedWindow.id, reason: .dragDistance)
                     }
                 }
@@ -119,7 +140,6 @@ struct DockedWindow: Identifiable {
         
         let width = DockitManager.shared.triggerAreaWidth
         
-        // 使用统一的坐标转换方法
         let windowInFlippedCoords = currentFrame.convert(from: .accessibility, to: .flipped, in: screen)
         
         switch edge {
@@ -144,7 +164,6 @@ struct DockedWindow: Identifiable {
         guard let currentFrame = try? axWindow.frame(),
               let screen = NSScreen.containing(currentFrame) ?? NSScreen.main else { return .zero }
         
-        // 使用统一的坐标转换方法
         let windowInFlippedCoords = currentFrame.convert(from: .accessibility, to: .flipped, in: screen)
         
         return CGRect(

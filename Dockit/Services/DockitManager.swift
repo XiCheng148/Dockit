@@ -133,7 +133,14 @@ class DockitManager: ObservableObject {
     }
     
     func undockAllWindows(type: UndockAllWindowsType = .normal) {
-        windowService.undockAllWindows(dockedWindows, type: type)
+        let windowsToUndock = dockedWindows // 获取当前停靠窗口的副本
+        if windowsToUndock.isEmpty {
+            DockitLogger.shared.logInfo("没有需要取消停靠的窗口")
+            return
+        }
+        DockitLogger.shared.logInfo("准备取消停靠所有窗口")
+        // 在调用 undockAllWindows 时添加 windows: 标签
+        windowService.undockAllWindows(windows: windowsToUndock, type: type)
     }
     
     func dockActiveWindow(to edge: DockEdge) {
@@ -212,7 +219,8 @@ class DockitManager: ObservableObject {
                         updatedWindow.isVisible = false
                         dockedWindows[index] = updatedWindow
                         
-                        DockitLogger.shared.logInfo("空间切换 - 收起窗口「\(try? dockedWindow.axWindow.title() ?? "")」")
+                        // 使用存储的标题记录日志
+                        DockitLogger.shared.logInfo("空间切换 - 收起窗口「\(dockedWindow.storedTitle)」")
                         dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
                     }
                 }

@@ -51,20 +51,13 @@ class WindowDockingService {
     }
     
     func undockWindow(_ dockedWindow: DockedWindow, reason: UndockReason = .userAction) {
-        // 如果是窗口关闭，就不要尝试获取窗口信息了
-        if reason != .windowClosed {
-            DockitLogger.shared.logWindowUndocked(
-                try? dockedWindow.axWindow.title(),
-                reason: reason,
-                frame: try? dockedWindow.axWindow.frame()
-            )
-        } else {
-            DockitLogger.shared.logWindowUndocked(
-                "未知窗口",  // 窗口关闭时使用默认标题
-                reason: reason,
-                frame: nil
-            )
-        }
+        // 统一使用存储的标题记录日志
+        // 如果窗口已关闭，frame 可能无法获取，所以传 nil
+        DockitLogger.shared.logWindowUndocked(
+            dockedWindow.storedTitle,
+            reason: reason,
+            frame: reason == .windowClosed ? nil : try? dockedWindow.axWindow.frame()
+        )
 
         if let observer = dockedWindow.observer {
             CFRunLoopRemoveSource(
@@ -74,13 +67,14 @@ class WindowDockingService {
             )
         }
         
-        // 安全地获取窗口标题
-        let windowTitle = (try? dockedWindow.axWindow.title()) ?? "未知窗口"
+        // 使用存储的标题来显示通知
+        let windowTitle = dockedWindow.storedTitle
         
         NotificationHelper.show(
             type: .success,
             title: windowTitle,
             description: "已取消停靠",
+            // 获取图标仍然尝试使用 axWindow，如果失败则不显示图标
             windowIcon: NotificationHelper.getAppIconForWindow(dockedWindow.axWindow)
         )
         
@@ -88,52 +82,23 @@ class WindowDockingService {
         onWindowUndocked?(dockedWindow.id, reason)
     }
     
-    func undockAllWindows(_ dockedWindows: [DockedWindow], type: UndockAllWindowsType = .normal) {
-        DockitLogger.shared.logUndockAllShortcut()
+    func undockAllWindows(windows: [DockedWindow], type: UndockAllWindowsType = .normal) {
+        DockitLogger.shared.logInfo("开始取消停靠所有窗口 (\(windows.count)个)")
         
-        // 先检查是不是空的
-        if dockedWindows.isEmpty {
-            DockitLogger.shared.logInfo("没有停靠的窗口")
+        windows.forEach { window in
+            // 将窗口恢复到原始位置 (仅在非退出时执行动画恢复)
+            let originalFrame = window.originalFrame
+            let targetFrame = type == .normal ? originalFrame : (try? window.axWindow.frame()) ?? originalFrame // 退出时直接使用当前位置
+            
+            // 尝试将窗口恢复到原始位置，忽略错误
+            DockitLogger.shared.logInfo("恢复窗口「\(window.storedTitle)」到 [\(Int(targetFrame.origin.x)),\(Int(targetFrame.origin.y))]")
+            
+            // 退出时不激活窗口
             if type == .normal {
-               NotificationHelper.show(
-                   type: .warning,
-                   title: "没有停靠的窗口"
-               )
-            }
-            return
-        }
-        
-        dockedWindows.forEach { window in
-            DockitLogger.shared.logWindowUndocked(
-                try? window.axWindow.title(),
-                reason: .userAction,
-                frame: window.originalFrame
-            )
-            
-            // 获取所有屏幕
-            let screens = NSScreen.screens
-            var targetFrame = window.originalFrame
-            
-            // 检查原始位置是否大部分在所有屏幕外
-            let isLargelyOffscreen = window.originalFrame.isLargelyOffscreen(threshold: 0.3)
-            
-            if isLargelyOffscreen {
-                // 如果窗口大部分在屏幕外，将其移动到当前屏幕或主屏幕中央
-                if let currentScreen = NSScreen.mostIntersecting(with: window.originalFrame) ?? NSScreen.main {
-                    let screenCenter = CGPoint(
-                        x: currentScreen.frame.midX - (window.originalFrame.width / 2),
-                        y: currentScreen.frame.midY - (window.originalFrame.height / 2)
-                    )
-                    targetFrame.origin = screenCenter
-                    
-                    DockitLogger.shared.logInfo("窗口 \(try? window.axWindow.title() ?? "") 原位置在屏幕外，已移至\(currentScreen == NSScreen.main ? "主" : "当前")屏幕中央")
+                if let windowToFocus = Windows.shared.inner.first(where: { $0.axWindow == window.axWindow }) {
+                    windowToFocus.focus()
+                    DockitLogger.shared.logInfo("已激活窗口 \(window.storedTitle)")
                 }
-            }
-            
-            // 在设置位置前先focus窗口
-            if let windowToFocus = Windows.shared.inner.first(where: { $0.axWindow == window.axWindow }) {
-                windowToFocus.focus()
-                DockitLogger.shared.logInfo("已激活窗口 \(try? window.axWindow.title() ?? "")")
             }
             
             try? window.axWindow.setPosition(targetFrame.origin)
@@ -144,7 +109,7 @@ class WindowDockingService {
             title: "已取消停靠所有窗口"
         )
         
-        // 通知 DockitManager 所有窗口已取消停靠
+        // 通知 DockitManager 所有窗口已取消停靠，DockitManager 会在这里清理 dockedWindows 列表
         onAllWindowsUndocked?()
     }
     
