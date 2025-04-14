@@ -92,7 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func quit() {
         // 先取消所有窗口停靠
-        DockitManager.shared.undockAllWindows(type: .quit)
+        DockitManager.shared.undockAllWindows(type: .normal)
 
         NotificationHelper.show(
             type: .success,
