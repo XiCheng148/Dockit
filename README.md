@@ -2,7 +2,7 @@
 
 Dockit是一个macOS窗口管理工具，专注于将窗口快速停靠在屏幕边缘并快速预览窗口。
 
-[English](./README_EN.md) | 中文
+中文 | [English](./README_EN.md)
 
 ## 📸 预览
 
