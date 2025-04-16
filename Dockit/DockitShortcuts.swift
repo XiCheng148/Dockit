@@ -17,8 +17,12 @@ class DockitShortcuts {
             if let app = NSWorkspace.shared.frontmostApplication {
                 let axApp = AxApplication(element: AXUIElementCreateApplication(app.processIdentifier))
                 if let window = try? axApp.focusedWindow(),
-                   let frame = try? window.frame() {
-                    DockPreviewController.shared.showPreview(for: .left, window: frame)
+                   let frame = try? window.frame(),
+                   let mainScreen = NSScreen.main { // 获取主屏幕
+                    // 计算目标位置
+                    let targetFrame = DockPreviewController.shared.calculateTargetFrame(window: frame, edge: .left, screen: mainScreen)
+                    // 调用新的预览函数
+                    DockPreviewController.shared.showAnimatedTransition(initialFrame: frame, targetFrame: targetFrame)
                 }
             }
         }
@@ -34,8 +38,12 @@ class DockitShortcuts {
             if let app = NSWorkspace.shared.frontmostApplication {
                 let axApp = AxApplication(element: AXUIElementCreateApplication(app.processIdentifier))
                 if let window = try? axApp.focusedWindow(),
-                   let frame = try? window.frame() {
-                    DockPreviewController.shared.showPreview(for: .right, window: frame)
+                   let frame = try? window.frame(),
+                   let mainScreen = NSScreen.main { // 获取主屏幕
+                    // 计算目标位置
+                    let targetFrame = DockPreviewController.shared.calculateTargetFrame(window: frame, edge: .right, screen: mainScreen)
+                    // 调用新的预览函数
+                    DockPreviewController.shared.showAnimatedTransition(initialFrame: frame, targetFrame: targetFrame)
                 }
             }
         }

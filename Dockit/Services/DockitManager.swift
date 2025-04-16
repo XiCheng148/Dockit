@@ -219,14 +219,46 @@ class DockitManager: ObservableObject {
                 if let index = dockedWindows.firstIndex(where: { $0.id == dockedWindow.id }) {
                     dockedWindows[index] = updatedWindow
                 }
-                
-                if shouldShow {
-                    if let window = Windows.shared.inner.first(where: { $0.axWindow == dockedWindow.axWindow }) {
-                        window.focus()
+
+                // 添加预览动画逻辑
+                if let currentFrame = try? dockedWindow.axWindow.frame(),
+                   let mainScreen = NSScreen.main { // 假设使用主屏幕，理想情况应获取窗口所在屏幕
+                    
+                    var initialFrame: CGRect = .zero
+                    var targetFrame: CGRect = .zero
+
+                    if shouldShow { // 展开
+                        initialFrame = currentFrame // 当前是收起状态的 Frame
+                        let targetPosition = WindowPositionCalculator.calculateExpandedPosition(
+                            window: initialFrame, // 使用收起时的 frame 计算
+                            edge: dockedWindow.edge,
+                            screen: mainScreen
+                        )
+                        targetFrame = CGRect(origin: targetPosition, size: initialFrame.size) // 保持尺寸不变
+                        DockPreviewController.shared.showAnimatedTransition(initialFrame: initialFrame, targetFrame: targetFrame)
+                        // 立即执行展开
+                        if let window = Windows.shared.inner.first(where: { $0.axWindow == dockedWindow.axWindow }) {
+                            window.focus()
+                        }
+                        dockedWindow.axWindow.expandTo(dockedWindow.edge)
+                    } else { // 收起
+                        initialFrame = currentFrame // 当前是展开状态的 Frame
+                        // 计算目标收起位置
+                        targetFrame = DockPreviewController.shared.calculateTargetFrame(window: initialFrame, edge: dockedWindow.edge, screen: mainScreen)
+                        DockPreviewController.shared.showAnimatedTransition(initialFrame: initialFrame, targetFrame: targetFrame)
+                        // 立即执行收起
+                        dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
                     }
-                    dockedWindow.axWindow.expandTo(dockedWindow.edge)
                 } else {
-                    dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
+                    // 如果无法获取当前 Frame，则跳过预览，直接执行操作 (保持原有逻辑)
+                    if shouldShow {
+                        if let window = Windows.shared.inner.first(where: { $0.axWindow == dockedWindow.axWindow }) {
+                            window.focus()
+                        }
+                        dockedWindow.axWindow.expandTo(dockedWindow.edge)
+                    } else {
+                        dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
+                    }
                 }
             }
         }

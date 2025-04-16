@@ -9,7 +9,7 @@ class DockPreviewController {
     private var autoCloseTimer: Timer?
     
     // 定义动画持续时间常量
-    private let animationDuration: TimeInterval = 0.6
+    private let animationDuration: TimeInterval = 0.4
     // 定义定时器额外缓冲时间
     private let timerBuffer: TimeInterval = 0.1
     
@@ -24,7 +24,7 @@ class DockPreviewController {
     
     private init() {}
     
-    func showPreview(for edge: DockEdge, window: CGRect) {
+    func showAnimatedTransition(initialFrame: CGRect, targetFrame: CGRect) {
         guard isPreviewEnabled else { return }
         
         // 取消之前的定时器并关闭已有窗口
@@ -34,13 +34,10 @@ class DockPreviewController {
         // 只使用主屏幕
         guard let mainScreen = NSScreen.main else { return }
         
-        let initialFrame = window
-        let targetFrame = calculateTargetFrame(window: window, edge: edge, screen: mainScreen)
-        
         createPreviewWindow(initialFrame: initialFrame, targetFrame: targetFrame)
     }
     
-    private func calculateTargetFrame(window: CGRect, edge: DockEdge, screen: NSScreen) -> CGRect {
+    public func calculateTargetFrame(window: CGRect, edge: DockEdge, screen: NSScreen) -> CGRect {
         let targetPosition = WindowPositionCalculator.calculateCollapsedPosition(
             window: window,
             edge: edge,
