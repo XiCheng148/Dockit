@@ -3,7 +3,7 @@ import Cocoa
 import LaunchAtLogin
 import SwiftUI
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate { // Add NSWindowDelegate
     var isFirstOpen = true
     var isLaunchedAtLogin = false
     var counter = 0
@@ -80,14 +80,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             settingsWindowController = windowController
             
             window.isReleasedWhenClosed = false
+            window.delegate = self // Set the delegate
         }
+        
+        // Temporarily change activation policy
+        NSApp.setActivationPolicy(.accessory)
         
         settingsWindowController?.showWindow(nil)
         if let window = settingsWindowController?.window {
             window.orderFrontRegardless()
             window.makeKey()
         }
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate(ignoringOtherApps: true) // Removed to prevent Dock icon appearance
     }
 
     @objc private func quit() {
@@ -113,6 +117,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if !AccessibilityHelper.shared.checkAccessibility() {
             // 自动打开设置窗口
             openSettings()
+        }
+    }
+    
+    // MARK: - NSWindowDelegate
+    
+    func windowWillClose(_ notification: Notification) {
+        // Revert activation policy when settings window closes
+        if let window = notification.object as? NSWindow, window == settingsWindowController?.window {
+            NSApp.setActivationPolicy(.prohibited)
         }
     }
 }
