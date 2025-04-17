@@ -9,7 +9,7 @@ class DockPreviewController {
     private var autoCloseTimer: Timer?
     
     // 定义动画持续时间常量
-    private let animationDuration: TimeInterval = 0.4
+    private let animationDuration: TimeInterval = 0.15
     // 定义定时器额外缓冲时间
     private let timerBuffer: TimeInterval = 0.1
     
