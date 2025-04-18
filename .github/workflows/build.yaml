@@ -81,7 +81,7 @@ jobs:
           ln -s /Applications dmg_source/Applications
 
           # 创建运行 xattr 命令的脚本
-          cat << EOF > dmg_source/"Fix Permissions.sh"
+          cat << EOF > dmg_source/"click.command"
           #!/bin/bash
           echo "Running xattr to remove quarantine attribute..."
           xattr -cr /Applications/Dockit.app
@@ -89,20 +89,20 @@ jobs:
           # Optional: Keep terminal open for a bit
           sleep 5
           EOF
-          chmod +x dmg_source/"Fix Permissions.sh"
+          chmod +x dmg_source/"click.command"
 
           # 使用 create-dmg 创建 DMG
           create-dmg \
             --volname "Dockit Installer" \
-            --background "Resources/dmg-background.jpg" \
-            --window-pos 200 120 \
-            --window-size 600 400 \
-            --icon-size 100 \
-            --icon "Dockit.app" 150 200 \
+            --volicon "Resources/dmg-icon.svg" \
+            --background "Resources/dmg-bg.svg" \
+            --window-size 660 400 \
+            --icon-size 60 \
+            --icon "Dockit.app" 80 170 \
             --hide-extension "Dockit.app" \
-            --icon "Fix Permissions.sh" 450 100 \
-            --app-drop-link 450 200 \
-            "dist/Dockit-${{ env.APP_VERSION }}.dmg" \
+            --icon "click.command" 520 170 \
+            --app-drop-link 300 170 \
+            "dist/Dockit.dmg" \
             "dmg_source/"
 
       - name: ⬆️ Upload Dockit DMG
