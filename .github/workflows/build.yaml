@@ -64,7 +64,9 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath dist/Dockit.xcarchive \
             -allowProvisioningUpdates \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_ENTITLEMENTS="" \
+            ENABLE_HARDENED_RUNTIME=NO
 
       - name: 🥡 Export Dockit.app
         run: |
