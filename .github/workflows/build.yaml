@@ -61,7 +61,7 @@ jobs:
             archive \
             -project Dockit.xcodeproj/ \
             -scheme "Dockit" \
-            -configuration Release \
+            -configuration Debug \
             -destination 'generic/platform=macOS' \
             -archivePath dist/Dockit.xcarchive \
             -allowProvisioningUpdates \
@@ -71,20 +71,9 @@ jobs:
             ENABLE_HARDENED_RUNTIME=NO \
             DEVELOPMENT_TEAM=""
 
-      - name: 🥡 Export Dockit.app
-        run: |
-          xcodebuild \
-            -exportArchive \
-            -archivePath dist/Dockit.xcarchive \
-            -exportPath dist/ \
-            -exportOptionsPlist Resources/ExportOptions.plist \
-            -allowProvisioningUpdates \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO
-
       - name: 🤏 Compress Dockit
         run: |
-          ditto -c -k --sequesterRsrc --keepParent "dist/Dockit.app" "dist/Dockit.zip"
+          ditto -c -k --sequesterRsrc --keepParent "dist/Dockit.xcarchive/Products/Applications/Dockit.app" "dist/Dockit.zip"
 
       - name: ⬆️ Upload Dockit
         uses: actions/upload-artifact@v4
