@@ -53,8 +53,8 @@ body:
 
   - type: input
     attributes:
-      label: Loop Version
-      description: You can find this in Loop\'s about window!
+      label: Dockit Version
+      description: You can find this in Dockit\'s about window!
       placeholder: |
         [ex. Version 1.0.0 (246)]
     validations:
