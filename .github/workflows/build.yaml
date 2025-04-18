@@ -68,15 +68,48 @@ jobs:
             ENABLE_HARDENED_RUNTIME=NO \
             DEVELOPMENT_TEAM=""
 
-      - name: 🤏 Compress Dockit
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent "dist/Dockit.xcarchive/Products/Applications/Dockit.app" "dist/Dockit.zip"
+      - name: ⚙️ Install create-dmg
+        run: brew install create-dmg
 
-      - name: ⬆️ Upload Dockit
+      - name: 📦 Create DMG
+        run: |
+          # 创建 DMG 内容的临时目录
+          mkdir -p dmg_source/
+          cp -R "dist/Dockit.xcarchive/Products/Applications/Dockit.app" dmg_source/
+
+          # 创建指向 Applications 目录的符号链接
+          ln -s /Applications dmg_source/Applications
+
+          # 创建运行 xattr 命令的脚本
+          cat << EOF > dmg_source/"Fix Permissions.sh"
+          #!/bin/bash
+          echo "Running xattr to remove quarantine attribute..."
+          xattr -cr /Applications/Dockit.app
+          echo "Done. You can now launch Dockit from the Applications folder."
+          # Optional: Keep terminal open for a bit
+          sleep 5
+          EOF
+          chmod +x dmg_source/"Fix Permissions.sh"
+
+          # 使用 create-dmg 创建 DMG
+          create-dmg \
+            --volname "Dockit Installer" \
+            --background "Resources/dmg_background.jpg" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "Dockit.app" 150 200 \
+            --hide-extension "Dockit.app" \
+            --icon "Fix Permissions.sh" 450 100 \
+            --app-drop-link 450 200 \
+            "dist/Dockit-${{ env.APP_VERSION }}.dmg" \
+            "dmg_source/"
+
+      - name: ⬆️ Upload Dockit DMG
         uses: actions/upload-artifact@v4
         with:
-          name: Dockit
-          path: dist/Dockit.zip
+          name: Dockit-DMG
+          path: dist/Dockit-*.dmg # 使用通配符匹配 DMG 文件
 
       - name: 🏷️ Create/update tag
         uses: actions/github-script@v7
@@ -133,7 +166,7 @@ jobs:
         if: "${{ inputs.release-new-build }}"
         with:
           allowUpdates: true
-          artifacts: dist/Dockit.zip
+          artifacts: dist/Dockit-*.dmg # 更新为上传 DMG 文件
           commit: main
           bodyFile: CHANGELOG.md
           name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
@@ -143,4 +176,5 @@ jobs:
 
       - name: 🧹 Cleanup
         run: |
+          rm -rf dmg_source/ # 清理 DMG 源目录
           echo "Cleanup complete (keychain step skipped as certificate installation was removed)."
