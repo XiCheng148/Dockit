@@ -1,39 +1,150 @@
-name: CI
+name: Dockit Development Build
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        default: 'develop'
+        description: 'branch'
+        required: true
+      release-new-build:
+        type: boolean
+        default: false
+        description: 'Release new build'
+        required: true
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - xcode: "16.1"
-            deployment_target: ""
-    runs-on:  macos-15
+  pre-release:
+    name: Development Build
+    runs-on: macos-14
+    permissions:
+      contents: write
+      pull-requests: read
     steps:
-      - uses: actions/checkout@v4
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.branch }}
 
-      - name: Clean Caches
+      - name: 🧪 Set Version and Build number
         run: |
-          echo "Cleaning SPM cache..."
-          rm -rf ~/Library/Caches/org.swift.swiftpm
-          echo "Cleaning DerivedData..."
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
-          echo "Cache cleaning complete."
+          # CHANGE EVERY RELEASE:
+          APP_VERSION="🧪 1.3.0"
+          APP_BUILD=$(git rev-list --count HEAD)
+          FROM_TAG=$(git describe --tags --abbrev=0 --exclude='prerelease')
 
-      - name: Build
-        run: xcodebuild -project Dockit.xcodeproj ONLY_ACTIVE_ARCH=NO -scheme Dockit -configuration Nightly ${{ matrix.deployment_target }}
-        env:
-          DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
+          # Set VERSION
+          latest_tag=$APP_VERSION
+          echo "Latest tag: $latest_tag"
+          sed -i -e "/VERSION =/ s/= .*/= $latest_tag/" Dockit/Config.xcconfig
 
-      - name: Archive
-        run: tar cvJf ~/Dockit.tar.xz -C /Users/runner/Library/Developer/Xcode/DerivedData/Dockit-csbkugdtxazzqogjnydbothqrvib/Build/Products/Nightly Dockit.app 
+          # Set BUILD_NUMBER
+          latest_commit_number=$APP_BUILD
+          echo "Latest commit number: $latest_commit_number"
+          sed -i -e "/BUILD_NUMBER =/ s/= .*/= $latest_commit_number/" Dockit/Config.xcconfig
 
-      - name: Save artifacts
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+          echo "APP_BUILD=$APP_BUILD" >> $GITHUB_ENV
+          echo "FROM_TAG=$FROM_TAG" >> $GITHUB_ENV
+
+      - name: 🔧 Select Xcode
+        run: sudo xcode-select -s "/Applications/Xcode_16.2.app"
+
+      - name: 🛠️ Build Dockit
+        run: |
+          xcodebuild \
+            archive \
+            -project Dockit.xcodeproj/ \
+            -scheme "Dockit (GH ACTIONS)" \
+            -destination 'generic/platform=macOS' \
+            -archivePath dist/Dockit.xcarchive \
+            -allowProvisioningUpdates \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+      - name: 🥡 Export Dockit.app
+        run: |
+          xcodebuild \
+            -exportArchive \
+            -archivePath dist/Dockit.xcarchive \
+            -exportPath dist/ \
+            -exportOptionsPlist Resources/ExportOptions.plist \
+            -allowProvisioningUpdates \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+      - name: 🤏 Compress Dockit
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent "dist/Dockit.app" "dist/Dockit.zip"
+
+      - name: ⬆️ Upload Dockit
         uses: actions/upload-artifact@v4
         with:
           name: Dockit
-          path: ~/Dockit.tar.xz
+          path: dist/Dockit.zip
+
+      - name: 🏷️ Create/update tag
+        uses: actions/github-script@v7
+        if: "${{ inputs.release-new-build }}"
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/prerelease',
+              sha: context.sha
+            }).catch(err => {
+              if (err.status !== 422) throw err;
+              github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'tags/prerelease',
+                sha: context.sha
+              });
+            })
+
+      - name: 📰 Build Changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        if: "${{ inputs.release-new-build }}"
+        with:
+          outputFile: CHANGELOG.md
+          fromTag: ${{ env.FROM_TAG }}
+          toTag: "prerelease"
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}\n## 💭 Uncategorized\n#{{UNCATEGORIZED}}",
+              "pr_template": "- #{{TITLE}} ##{{NUMBER}}",
+              "categories": [
+                {
+                    "title": "## ✨ New Features",
+                    "labels": ["Feature", "Luminare", "Improvement"]
+                },
+                {
+                    "title": "## 🐞 Bug Fixes",
+                    "labels": ["Bug"]
+                },
+                {
+                    "title": "## 🌐 Localization",
+                    "labels": ["Localization"]
+                }
+              ],
+              "empty_template": "- ❌ No changes found"
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🥳 Publish Dev Build
+        uses: ncipollo/release-action@v1
+        if: "${{ inputs.release-new-build }}"
+        with:
+          allowUpdates: true
+          artifacts: dist/Dockit.zip
+          commit: develop
+          bodyFile: CHANGELOG.md
+          name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
+          prerelease: true
+          tag: "prerelease"
+
+      - name: 🧹 Cleanup
+        run: |
+          echo "Cleanup complete (keychain step skipped as certificate installation was removed)."
