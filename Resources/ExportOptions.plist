@@ -6,5 +6,7 @@
     <string>debugging</string>
     <key>destination</key>
     <string>export</string>
+    <key>signingStyle</key>
+    <string>manual</string>
 </dict>
 </plist> 
