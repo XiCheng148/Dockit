@@ -108,7 +108,7 @@ jobs:
       - name: ⬆️ Upload Dockit DMG
         uses: actions/upload-artifact@v4
         with:
-          name: Dockit-DMG
+          name: Dockit
           path: dist/Dockit*.dmg # 使用通配符匹配 DMG 文件
 
       - name: 🏷️ Create/update tag
