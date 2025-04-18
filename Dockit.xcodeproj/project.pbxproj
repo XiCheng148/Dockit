@@ -10,7 +10,6 @@
 		460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 460E59EA2D2448C000787017 /* KeyboardShortcuts */; };
 		462BCA8F2D82DF9B00B475FC /* DynamicNotchKit in Frameworks */ = {isa = PBXBuildFile; productRef = 462BCA8E2D82DF9B00B475FC /* DynamicNotchKit */; };
 		46A1EF242D2471EF00E83601 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF232D2471EF00E83601 /* Defaults */; };
-		46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF252D2471EF00E83601 /* DefaultsMacros */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
 		64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64EBAF942CFECF7E000429A4 /* SkyLight.framework */; };
 /* End PBXBuildFile section */
@@ -33,7 +32,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				46A1EF262D2471EF00E83601 /* DefaultsMacros in Frameworks */,
 				462BCA8F2D82DF9B00B475FC /* DynamicNotchKit in Frameworks */,
 				46A1EF242D2471EF00E83601 /* Defaults in Frameworks */,
 				460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */,
@@ -395,8 +393,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMinorVersion;
+				minimumVersion = 8.2.0;
 			};
 		};
 		64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
