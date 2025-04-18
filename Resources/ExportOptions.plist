@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>development</string>
+    <string>debugging</string>
     <key>destination</key>
     <string>export</string>
 </dict>
