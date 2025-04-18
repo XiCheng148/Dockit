@@ -91,7 +91,6 @@
 				64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */,
 				460E59EA2D2448C000787017 /* KeyboardShortcuts */,
 				46A1EF232D2471EF00E83601 /* Defaults */,
-				46A1EF252D2471EF00E83601 /* DefaultsMacros */,
 				462BCA8E2D82DF9B00B475FC /* DynamicNotchKit */,
 			);
 			productName = Dockit;
@@ -422,11 +421,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
-		};
-		46A1EF252D2471EF00E83601 /* DefaultsMacros */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */;
-			productName = DefaultsMacros;
 		};
 		64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
