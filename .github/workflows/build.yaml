@@ -94,7 +94,7 @@ jobs:
           # 使用 create-dmg 创建 DMG
           create-dmg \
             --volname "Dockit Installer" \
-            --background "Resources/dmg_background.jpg" \
+            --background "Resources/dmg-background.jpg" \
             --window-pos 200 120 \
             --window-size 600 400 \
             --icon-size 100 \
