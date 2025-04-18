@@ -31,7 +31,7 @@ jobs:
       - name: 🧪 Set Version and Build number
         run: |
           # CHANGE EVERY RELEASE:
-          APP_VERSION="🧪 1.3.0"
+          APP_VERSION=""
           APP_BUILD=$(git rev-list --count HEAD)
           FROM_TAG=$(git describe --tags --abbrev=0 --exclude='prerelease')
 
