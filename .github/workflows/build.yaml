@@ -1,21 +1,18 @@
 name: Dockit Development Build
 
 on:
-  push:
-    branches:
-      - main
-  # workflow_dispatch:
-  #   inputs:
-  #     branch:
-  #       type: string
-  #       default: 'main'
-  #       description: 'branch'
-  #       required: true
-  #     release-new-build:
-  #       type: boolean
-  #       default: false
-  #       description: 'Release new build'
-  #       required: true
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        default: 'main'
+        description: 'branch'
+        required: true
+      release-new-build:
+        type: boolean
+        default: false
+        description: 'Release new build'
+        required: true
 
 jobs:
   pre-release:
@@ -61,7 +58,7 @@ jobs:
             archive \
             -project Dockit.xcodeproj/ \
             -scheme "Dockit" \
-            -configuration Debug \
+            -configuration Release \
             -destination 'generic/platform=macOS' \
             -archivePath dist/Dockit.xcarchive \
             -allowProvisioningUpdates \
@@ -89,14 +86,14 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/prerelease',
+              ref: 'refs/tags/latest',
               sha: context.sha
             }).catch(err => {
               if (err.status !== 422) throw err;
               github.rest.git.updateRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'tags/prerelease',
+                ref: 'tags/latest',
                 sha: context.sha
               });
             })
@@ -107,7 +104,7 @@ jobs:
         with:
           outputFile: CHANGELOG.md
           fromTag: ${{ env.FROM_TAG }}
-          toTag: "prerelease"
+          toTag: "latest"
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}\n## 💭 Uncategorized\n#{{UNCATEGORIZED}}",
@@ -140,8 +137,8 @@ jobs:
           commit: develop
           bodyFile: CHANGELOG.md
           name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
-          prerelease: true
-          tag: "prerelease"
+          prerelease: false
+          tag: "latest"
 
       - name: 🧹 Cleanup
         run: |
