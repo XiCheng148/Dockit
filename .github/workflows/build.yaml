@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Dockit-DMG
-          path: dist/Dockit-*.dmg # 使用通配符匹配 DMG 文件
+          path: dist/Dockit*.dmg # 使用通配符匹配 DMG 文件
 
       - name: 🏷️ Create/update tag
         uses: actions/github-script@v7
@@ -166,7 +166,7 @@ jobs:
         if: "${{ inputs.release-new-build }}"
         with:
           allowUpdates: true
-          artifacts: dist/Dockit-*.dmg # 更新为上传 DMG 文件
+          artifacts: dist/Dockit*.dmg # 更新为上传 DMG 文件
           commit: main
           bodyFile: CHANGELOG.md
           name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
