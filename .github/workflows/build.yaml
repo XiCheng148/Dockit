@@ -5,7 +5,7 @@ on:
     inputs:
       branch:
         type: string
-        default: 'develop'
+        default: 'main'
         description: 'branch'
         required: true
       release-new-build:
@@ -57,7 +57,7 @@ jobs:
           xcodebuild \
             archive \
             -project Dockit.xcodeproj/ \
-            -scheme "Dockit (GH ACTIONS)" \
+            -scheme "Dockit" \
             -destination 'generic/platform=macOS' \
             -archivePath dist/Dockit.xcarchive \
             -allowProvisioningUpdates \
