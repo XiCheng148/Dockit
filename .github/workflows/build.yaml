@@ -1,18 +1,21 @@
 name: Dockit Development Build
 
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        type: string
-        default: 'main'
-        description: 'branch'
-        required: true
-      release-new-build:
-        type: boolean
-        default: false
-        description: 'Release new build'
-        required: true
+  push:
+    branches:
+      - main
+  # workflow_dispatch:
+  #   inputs:
+  #     branch:
+  #       type: string
+  #       default: 'main'
+  #       description: 'branch'
+  #       required: true
+  #     release-new-build:
+  #       type: boolean
+  #       default: false
+  #       description: 'Release new build'
+  #       required: true
 
 jobs:
   pre-release:
