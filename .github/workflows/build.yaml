@@ -134,11 +134,12 @@ jobs:
         with:
           allowUpdates: true
           artifacts: dist/Dockit.zip
-          commit: develop
+          commit: main
           bodyFile: CHANGELOG.md
           name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
           prerelease: false
-          tag: "latest"
+          tag: latest
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🧹 Cleanup
         run: |
