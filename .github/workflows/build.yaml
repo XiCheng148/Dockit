@@ -1,4 +1,4 @@
-name: Dockit Build And Release
+name: Dockit Development Build
 
 on:
   workflow_dispatch:
@@ -16,12 +16,11 @@ on:
 
 jobs:
   pre-release:
-    name: Build
+    name: Development Build
     runs-on: macos-14
     permissions:
       contents: write
       pull-requests: read
-      actions: write
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v4
@@ -32,7 +31,7 @@ jobs:
       - name: 🧪 Set Version and Build number
         run: |
           # CHANGE EVERY RELEASE:
-          APP_VERSION="0.0.4"
+          APP_VERSION="0.0.5"
           APP_BUILD=$(git rev-list --count HEAD)
           FROM_TAG=$(git describe --tags --abbrev=0 --exclude='prerelease')
 
@@ -53,11 +52,29 @@ jobs:
       - name: 🔧 Select Xcode
         run: sudo xcode-select -s "/Applications/Xcode_16.2.app"
 
-      - name: 🔐 导入代码签名证书
-        uses: apple-actions/import-codesigning-certs@v1
-        with:
-          p12-file-base64: ${{ secrets.CERTIFICATE_BASE64 }}
-          p12-password: ${{ secrets.CERTIFICATE_PASSWORD }}
+      - name: 🎟️ Install Certificate
+        id: profile
+        env:
+          DEVELOPMENT_CERT_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
+          DEVELOPER_ID_CERT_BASE64: ${{ secrets.DEVELOPER_ID_CERT_BASE64 }}
+          P12_PASSWORD: ${{ secrets.CERTIFICATE_PASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          DEVELOPMENT_CERT_PATH=$RUNNER_TEMP/dev.p12
+          # DEVELOPER_ID_CERT_PATH=$RUNNER_TEMP/devid.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          echo -n "$DEVELOPMENT_CERT_BASE64" | base64 --decode -o $DEVELOPMENT_CERT_PATH
+          # echo -n "$DEVELOPER_ID_CERT_BASE64" | base64 --decode -o $DEVELOPER_ID_CERT_PATH
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          security import $DEVELOPMENT_CERT_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          # security import $DEVELOPER_ID_CERT_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+
+          security list-keychain -d user -s $KEYCHAIN_PATH
 
       - name: 🛠️ Build Dockit
         run: |
@@ -65,58 +82,43 @@ jobs:
             archive \
             -project Dockit.xcodeproj/ \
             -scheme "Dockit" \
-            -configuration Release \
             -destination 'generic/platform=macOS' \
             -archivePath dist/Dockit.xcarchive \
-            -allowProvisioningUpdates \
-            CODE_SIGN_IDENTITY="Apple Development" \
-            CODE_SIGNING_REQUIRED=YES \
-            CODE_SIGN_ENTITLEMENTS="Dockit/Dockit.entitlements" \
-            ENABLE_HARDENED_RUNTIME=YES \
-            DEVELOPMENT_TEAM="8QL76STYD6"
+            -allowProvisioningUpdates
 
-      - name: ⚙️ Install create-dmg
-        run: brew install create-dmg
-
-      - name: 📦 Create DMG
+      - name: 🥡 Export Dockit.app
         run: |
-          # 创建 DMG 内容的临时目录
-          mkdir -p dmg_source/
-          cp -R "dist/Dockit.xcarchive/Products/Applications/Dockit.app" dmg_source/
+          xcodebuild \
+            -exportArchive \
+            -archivePath dist/Dockit.xcarchive \
+            -exportPath dist/ \
+            -exportOptionsPlist ExportOptions.plist \
+            -allowProvisioningUpdates
 
-          # 创建指向 Applications 目录的符号链接
-          ln -s /Applications dmg_source/Applications
+      - name: 🤏 Compress Dockit.app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent "dist/Dockit.app" "dist/Dockit.zip"
+      
+#      - name: ✅ Notarize Dockit
+#        env:
+#          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+#          APPLE_ID: ${{ secrets.APPLE_ID }}
+#          APPLE_ID_PWD: ${{ secrets.APPLE_ID_PWD }}
+#        run: |
+#          xcrun notarytool store-credentials Dockit --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_ID_PWD"
+#          xcrun notarytool submit "dist/Dockit.zip" --keychain-profile "Dockit" --wait
+#          xcrun stapler staple "dist/Dockit.app"
+#
+#      - name: 🤏 Compress notarized Dockit
+#        run: |
+#          rm dist/Dockit.zip
+#          ditto -c -k --sequesterRsrc --keepParent "dist/Dockit.app" "dist/Dockit.zip"
 
-          # 创建运行 xattr 命令的脚本
-          cat << EOF > dmg_source/"click.command"
-          #!/bin/bash
-          echo "Running xattr to remove quarantine attribute..."
-          xattr -cr /Applications/Dockit.app
-          echo "Done. You can now launch Dockit from the Applications folder."
-          # Optional: Keep terminal open for a bit
-          sleep 5
-          EOF
-          chmod +x dmg_source/"click.command"
-
-          # 使用 create-dmg 创建 DMG
-          # --icon "click.command" 520 170 \
-          create-dmg \
-            --volname "Dockit Installer" \
-            --volicon "Resources/dmg-icon.svg" \
-            --background "Resources/dmg-bg.svg" \
-            --window-size 660 400 \
-            --icon-size 60 \
-            --icon "Dockit.app" 80 170 \
-            --hide-extension "Dockit.app" \
-            --app-drop-link 300 170 \
-            "dist/Dockit.dmg" \
-            "dmg_source/"
-
-      - name: ⬆️ Upload Dockit DMG
+      - name: ⬆️ Upload Dockit
         uses: actions/upload-artifact@v4
         with:
           name: Dockit
-          path: dist/Dockit*.dmg # 使用通配符匹配 DMG 文件
+          path: dist/Dockit.zip
 
       - name: 🏷️ Create/update tag
         uses: actions/github-script@v7
@@ -126,14 +128,14 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/latest',
+              ref: 'refs/tags/prerelease',
               sha: context.sha
             }).catch(err => {
               if (err.status !== 422) throw err;
               github.rest.git.updateRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'tags/latest',
+                ref: 'tags/prerelease',
                 sha: context.sha
               });
             })
@@ -144,7 +146,7 @@ jobs:
         with:
           outputFile: CHANGELOG.md
           fromTag: ${{ env.FROM_TAG }}
-          toTag: "latest"
+          toTag: "prerelease"
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}\n## 💭 Uncategorized\n#{{UNCATEGORIZED}}",
@@ -168,25 +170,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🥳 Publish Build
+      - name: 🥳 Publish Dev Build
         uses: ncipollo/release-action@v1
         if: "${{ inputs.release-new-build }}"
         with:
           allowUpdates: true
-          artifacts: dist/Dockit*.dmg # 更新为上传 DMG 文件
+          artifacts: dist/Dockit.zip
           commit: main
           bodyFile: CHANGELOG.md
-          name: "${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
-          prerelease: false
-          tag: latest
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
+          prerelease: true
+          tag: "prerelease"
 
       - name: 🧹 Cleanup
         run: |
-          # 清理密钥链
-          if [ -f "$RUNNER_TEMP/app-signing.keychain-db" ]; then
-            security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db"
-          fi
-          
-          rm -rf dmg_source/ # 清理 DMG 源目录
-          echo "Cleanup complete"
+          security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db"
