@@ -53,6 +53,31 @@ jobs:
       - name: 🔧 Select Xcode
         run: sudo xcode-select -s "/Applications/Xcode_16.2.app"
 
+      - name: 🔐 安装证书和配置文件
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ github.run_id }}
+        run: |
+          # 创建临时密钥链
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          # 将密钥链添加到搜索列表
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed s/\"//g)
+          
+          # 从 base64 解码证书并导入密钥链
+          echo $CERTIFICATE_BASE64 | base64 --decode > $RUNNER_TEMP/certificate.p12
+          security import $RUNNER_TEMP/certificate.p12 -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          
+          # 允许 codesign 访问证书而不需要用户交互
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          # 清理临时文件
+          rm -f $RUNNER_TEMP/certificate.p12
+
       - name: 🛠️ Build Dockit
         run: |
           xcodebuild \
@@ -63,11 +88,11 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath dist/Dockit.xcarchive \
             -allowProvisioningUpdates \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="Apple Development" \
+            CODE_SIGNING_REQUIRED=YES \
             CODE_SIGN_ENTITLEMENTS="Dockit/Dockit.entitlements" \
             ENABLE_HARDENED_RUNTIME=YES \
-            DEVELOPMENT_TEAM=""
+            DEVELOPMENT_TEAM="8QL76STYD6"
 
       - name: ⚙️ Install create-dmg
         run: brew install create-dmg
@@ -177,5 +202,10 @@ jobs:
 
       - name: 🧹 Cleanup
         run: |
+          # 清理密钥链
+          if [ -f "$RUNNER_TEMP/app-signing.keychain-db" ]; then
+            security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db"
+          fi
+          
           rm -rf dmg_source/ # 清理 DMG 源目录
-          echo "Cleanup complete (keychain step skipped as certificate installation was removed)."
+          echo "Cleanup complete"
