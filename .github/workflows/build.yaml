@@ -1,4 +1,4 @@
-name: Dockit Development Build
+name: Dockit Build And Release
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ on:
 
 jobs:
   pre-release:
-    name: Development Build
+    name: Build
     runs-on: macos-14
     permissions:
       contents: write
