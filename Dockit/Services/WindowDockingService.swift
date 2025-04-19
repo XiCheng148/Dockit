@@ -88,9 +88,23 @@ class WindowDockingService {
         windows.forEach { window in
             // 将窗口恢复到原始位置 (仅在非退出时执行动画恢复)
             let originalFrame = window.originalFrame
-            let targetFrame = type == .normal ? originalFrame : (try? window.axWindow.frame()) ?? originalFrame // 退出时直接使用当前位置
+            let targetFrame: NSRect
             
-            // 尝试将窗口恢复到原始位置，忽略错误
+            if type == .normal {
+                // 判断原始位置是否大部分在屏幕外
+                if isWindowMostlyOffscreen(frame: originalFrame) {
+                    // 如果窗口80%在屏幕外，则将其移动到屏幕中间
+                    targetFrame = centerFrameOnMainScreen(size: originalFrame.size)
+                    DockitLogger.shared.logInfo("窗口「\(window.storedTitle)」原位置大部分在屏幕外，将移动到屏幕中间")
+                } else {
+                    targetFrame = originalFrame
+                }
+            } else {
+                // 退出时直接使用当前位置
+                targetFrame = (try? window.axWindow.frame()) ?? originalFrame
+            }
+            
+            // 尝试将窗口恢复到目标位置，忽略错误
             DockitLogger.shared.logInfo("恢复窗口「\(window.storedTitle)」到 [\(Int(targetFrame.origin.x)),\(Int(targetFrame.origin.y))]")
             
             // 退出时不激活窗口
@@ -111,6 +125,36 @@ class WindowDockingService {
         
         // 通知 DockitManager 所有窗口已取消停靠，DockitManager 会在这里清理 dockedWindows 列表
         onAllWindowsUndocked?()
+    }
+    
+    // 判断窗口是否有80%在屏幕外
+    private func isWindowMostlyOffscreen(frame: NSRect) -> Bool {
+        guard let mainScreen = NSScreen.main else { return false }
+        let screenFrame = mainScreen.visibleFrame
+        
+        // 计算窗口与屏幕的交集面积
+        let intersection = NSIntersectionRect(frame, screenFrame)
+        let windowArea = frame.width * frame.height
+        let intersectionArea = intersection.width * intersection.height
+        
+        // 计算在屏幕外的比例
+        let offscreenRatio = 1.0 - (intersectionArea / windowArea)
+        
+        // 如果80%以上在屏幕外，返回true
+        return offscreenRatio >= 0.8
+    }
+    
+    // 在主屏幕中心创建一个窗口位置
+    private func centerFrameOnMainScreen(size: NSSize) -> NSRect {
+        guard let mainScreen = NSScreen.main else {
+            return NSRect(x: 0, y: 0, width: size.width, height: size.height)
+        }
+        
+        let screenFrame = mainScreen.visibleFrame
+        let x = screenFrame.origin.x + (screenFrame.width - size.width) / 2
+        let y = screenFrame.origin.y + (screenFrame.height - size.height) / 2
+        
+        return NSRect(x: x, y: y, width: size.width, height: size.height)
     }
     
     func dockActiveWindow(to edge: DockEdge) {
