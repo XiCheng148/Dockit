@@ -32,7 +32,7 @@ jobs:
       - name: 🧪 Set Version and Build number
         run: |
           # CHANGE EVERY RELEASE:
-          APP_VERSION=""
+          APP_VERSION="0.0.4"
           APP_BUILD=$(git rev-list --count HEAD)
           FROM_TAG=$(git describe --tags --abbrev=0 --exclude='prerelease')
 
@@ -162,7 +162,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🥳 Publish Dev Build
+      - name: 🥳 Publish Build
         uses: ncipollo/release-action@v1
         if: "${{ inputs.release-new-build }}"
         with:
@@ -170,7 +170,7 @@ jobs:
           artifacts: dist/Dockit*.dmg # 更新为上传 DMG 文件
           commit: main
           bodyFile: CHANGELOG.md
-          name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
+          name: "${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
           prerelease: false
           tag: latest
           token: ${{ secrets.GITHUB_TOKEN }}
