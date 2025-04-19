@@ -220,6 +220,9 @@ class DockitManager: ObservableObject {
                     dockedWindows[index] = updatedWindow
                 }
 
+                // 无论是展开还是收起，先取消当前正在进行的动画和操作
+                DockPreviewController.shared.cancelCurrentAnimation()
+
                 // 添加预览动画逻辑
                 if let currentFrame = try? dockedWindow.axWindow.frame(),
                    let mainScreen = NSScreen.main { // 假设使用主屏幕，理想情况应获取窗口所在屏幕
@@ -235,19 +238,27 @@ class DockitManager: ObservableObject {
                             screen: mainScreen
                         )
                         targetFrame = CGRect(origin: targetPosition, size: initialFrame.size) // 保持尺寸不变
-                        DockPreviewController.shared.showAnimatedTransition(initialFrame: initialFrame, targetFrame: targetFrame)
-                        // 立即执行展开
-                        if let window = Windows.shared.inner.first(where: { $0.axWindow == dockedWindow.axWindow }) {
-                            window.focus()
+                        
+                        // 先执行预览动画，再执行实际的窗口展开操作
+                        DockPreviewController.shared.showAnimatedTransition(initialFrame: initialFrame, targetFrame: targetFrame) {
+                            // 动画完成后执行窗口展开
+                            if let window = Windows.shared.inner.first(where: { $0.axWindow == dockedWindow.axWindow }) {
+                                window.focus()
+                            }
+                            dockedWindow.axWindow.expandTo(dockedWindow.edge)
                         }
-                        dockedWindow.axWindow.expandTo(dockedWindow.edge)
                     } else { // 收起
                         initialFrame = currentFrame // 当前是展开状态的 Frame
                         // 计算目标收起位置
                         targetFrame = DockPreviewController.shared.calculateTargetFrame(window: initialFrame, edge: dockedWindow.edge, screen: mainScreen)
-                        DockPreviewController.shared.showAnimatedTransition(initialFrame: initialFrame, targetFrame: targetFrame)
-                        // 立即执行收起
+                        
+                        // 先执行实际的窗口收起操作，再执行动画
                         dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
+                        
+                        // 在窗口收起后执行动画
+                        if let newFrame = try? dockedWindow.axWindow.frame() {
+                            DockPreviewController.shared.showAnimatedTransition(initialFrame: initialFrame, targetFrame: newFrame)
+                        }
                     }
                 } else {
                     // 如果无法获取当前 Frame，则跳过预览，直接执行操作 (保持原有逻辑)
@@ -280,6 +291,11 @@ class DockitManager: ObservableObject {
                         
                         // 使用存储的标题记录日志
                         DockitLogger.shared.logInfo("空间切换 - 收起窗口「\(dockedWindow.storedTitle)」")
+                        
+                        // 取消任何当前正在进行的动画和操作
+                        DockPreviewController.shared.cancelCurrentAnimation()
+                        
+                        // 如果无法获取窗口框架，直接执行收起
                         dockedWindow.axWindow.dockTo(dockedWindow.edge, exposedPixels: exposedPixels)
                     }
                 }
