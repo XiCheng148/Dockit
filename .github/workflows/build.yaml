@@ -101,7 +101,7 @@ jobs:
             --icon-size 60 \
             --icon "Dockit.app" 80 170 \
             --hide-extension "Dockit.app" \
-            # --icon "click.command" 520 170 \
+            --icon "click.command" 520 170 \
             --app-drop-link 300 170 \
             "dist/Dockit.dmg" \
             "dmg_source/"
