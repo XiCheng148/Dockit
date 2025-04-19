@@ -37,11 +37,11 @@ Dockit是一个macOS窗口管理工具，专注于将窗口快速停靠在屏幕
 
 ## ⭐ Star
 
-<a href="https://star-history.com/#XiCheng148/Dockit&Date">
+<a href="https://star-history.com/#XiCheng000/Dockit&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=XiCheng148/Dockit&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=XiCheng148/Dockit&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=XiCheng148/Dockit&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=XiCheng000/Dockit&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=XiCheng000/Dockit&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=XiCheng000/Dockit&type=Date" />
  </picture>
 </a>
 
@@ -52,7 +52,7 @@ Dockit是一个macOS窗口管理工具，专注于将窗口快速停靠在屏幕
 ## 🙏 感谢
 
 - [Peninsula](https://github.com/Celve/Peninsula) - 窗口相关特定实现参考此项目
-- [Awesome-Merge-Picture](https://github.com/XiCheng148/Awesome-Merge-Picture) - 一个快速创建暗黑和亮色模式的预览图片的工具
+- [Awesome-Merge-Picture](https://github.com/XiCheng000/Awesome-Merge-Picture) - 一个快速创建暗黑和亮色模式的预览图片的工具
 - [NotchNotification](https://github.com/Lakr233/NotchNotification) - 刘海通知、浮动通知。
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) - 快捷键绑定
 - [LaunchAtLogin-Modern](https://github.com/sindresorhus/LaunchAtLogin-Modern) - 开机自启动
