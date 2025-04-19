@@ -65,8 +65,8 @@ jobs:
             -allowProvisioningUpdates \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_ENTITLEMENTS="" \
-            ENABLE_HARDENED_RUNTIME=NO \
+            CODE_SIGN_ENTITLEMENTS="Dockit/Dockit.entitlements" \
+            ENABLE_HARDENED_RUNTIME=YES \
             DEVELOPMENT_TEAM=""
 
       - name: ⚙️ Install create-dmg
@@ -93,6 +93,7 @@ jobs:
           chmod +x dmg_source/"click.command"
 
           # 使用 create-dmg 创建 DMG
+          # --icon "click.command" 520 170 \
           create-dmg \
             --volname "Dockit Installer" \
             --volicon "Resources/dmg-icon.svg" \
@@ -101,7 +102,6 @@ jobs:
             --icon-size 60 \
             --icon "Dockit.app" 80 170 \
             --hide-extension "Dockit.app" \
-            --icon "click.command" 520 170 \
             --app-drop-link 300 170 \
             "dist/Dockit.dmg" \
             "dmg_source/"
