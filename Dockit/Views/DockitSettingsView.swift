@@ -119,6 +119,14 @@ struct DockitSettingsView: View {
     
     @State private var expandModifiers: UInt = Defaults[.expandModifiers]
     @State private var collapseModifiers: UInt = Defaults[.collapseModifiers]
+    @State private var lastCopyTime: Date? = nil // For debounce
+
+    // Computed property to get version string
+    private var appVersionString: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "N/A"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "N/A"
+        return "Version \(version) (Build \(build))"
+    }
     
     var body: some View {
         Form {
@@ -309,10 +317,21 @@ struct DockitSettingsView: View {
         } message: {
             Text("已获得辅助功能权限，需要重启应用才能生效。")
         }
-        Text("当前版本仅支持在主屏幕上停靠窗口")
+        // Version display and copy functionality
+        Text(appVersionString)
             .font(.caption)
             .foregroundColor(.secondary)
             .padding(.bottom, 8)
+            .onTapGesture {
+                copyVersionToClipboard()
+            }
+            .onHover { hovering in // Add hover effect
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
     }
     
     private func activateWindow() {
@@ -350,6 +369,27 @@ struct DockitSettingsView: View {
         process.launchPath = executablePath
         try? process.run()
         NSApp.terminate(nil)
+    }
+    
+    private func copyVersionToClipboard() {
+        let now = Date()
+        // Debounce: Allow copy only if 1 second has passed since the last copy
+        if let lastTime = lastCopyTime, now.timeIntervalSince(lastTime) < 1.0 {
+            DockitLogger.shared.logInfo("Debounced: Too soon to copy version again.")
+            return
+        }
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        if pasteboard.setString(appVersionString, forType: .string) {
+            lastCopyTime = now // Update last copy time
+            NotificationHelper.show(type: .success, title: "版本号已复制")
+            DockitLogger.shared.logInfo("Version copied: \(appVersionString)")
+        } else {
+            DockitLogger.shared.logError("Failed to copy version to clipboard.")
+            // Optionally show an error notification
+            // NotificationHelper.show(type: .error, title: "复制失败")
+        }
     }
 } 
 
