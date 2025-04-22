@@ -10,6 +10,7 @@
 		460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 460E59EA2D2448C000787017 /* KeyboardShortcuts */; };
 		462BCA8F2D82DF9B00B475FC /* DynamicNotchKit in Frameworks */ = {isa = PBXBuildFile; productRef = 462BCA8E2D82DF9B00B475FC /* DynamicNotchKit */; };
 		46A1EF242D2471EF00E83601 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 46A1EF232D2471EF00E83601 /* Defaults */; };
+		46ECF83B2DB62C9F00021B1E /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 46ECF83A2DB62C9F00021B1E /* Luminare */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
 		64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64EBAF942CFECF7E000429A4 /* SkyLight.framework */; };
 /* End PBXBuildFile section */
@@ -33,6 +34,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				462BCA8F2D82DF9B00B475FC /* DynamicNotchKit in Frameworks */,
+				46ECF83B2DB62C9F00021B1E /* Luminare in Frameworks */,
 				46A1EF242D2471EF00E83601 /* Defaults in Frameworks */,
 				460E59EB2D2448C000787017 /* KeyboardShortcuts in Frameworks */,
 				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
@@ -92,6 +94,7 @@
 				460E59EA2D2448C000787017 /* KeyboardShortcuts */,
 				46A1EF232D2471EF00E83601 /* Defaults */,
 				462BCA8E2D82DF9B00B475FC /* DynamicNotchKit */,
+				46ECF83A2DB62C9F00021B1E /* Luminare */,
 			);
 			productName = Dockit;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Dockit.app */;
@@ -126,6 +129,7 @@
 				460E59E92D2448C000787017 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */,
 				462BCA8D2D82DF9B00B475FC /* XCRemoteSwiftPackageReference "DynamicNotchKit" */,
+				46ECF8392DB62C9F00021B1E /* XCRemoteSwiftPackageReference "Luminare" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -398,6 +402,14 @@
 				minimumVersion = 8.2.0;
 			};
 		};
+		46ECF8392DB62C9F00021B1E /* XCRemoteSwiftPackageReference "Luminare" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MrKai77/Luminare.git";
+			requirement = {
+				branch = "loop-1.2.0";
+				kind = branch;
+			};
+		};
 		64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
@@ -423,6 +435,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 46A1EF222D2471EF00E83601 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		46ECF83A2DB62C9F00021B1E /* Luminare */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 46ECF8392DB62C9F00021B1E /* XCRemoteSwiftPackageReference "Luminare" */;
+			productName = Luminare;
 		};
 		64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
