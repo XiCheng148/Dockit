@@ -3,7 +3,32 @@ import Cocoa
 import LaunchAtLogin
 import SwiftUI
 
-class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate { // Add NSWindowDelegate
+@main
+struct DockitApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
+    var body: some Scene {
+        MenuBarExtra("Dockit",image:"MenuBarIcon") {
+            #if DEBUG
+                Text("DEV BUILD: \(Bundle.main.appVersion ?? "Unknown") (\(Bundle.main.appBuild ?? 0))")
+                    .font(.system(size: 11, weight: .semibold))
+            #endif
+            
+            Button("设置") {
+                appDelegate.openSettings()
+            }
+            .keyboardShortcut(",", modifiers: .command)
+            
+            Button("退出") {
+                appDelegate.quit()
+            }
+            .keyboardShortcut("q", modifiers: .command)
+        }
+        .menuBarExtraStyle(.menu)
+    }
+}
+
+class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var isFirstOpen = true
     var isLaunchedAtLogin = false
     var counter = 0
@@ -12,56 +37,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate { // Add NS
 
     private var dockitManager: DockitManager?
     private var settingsWindowController: NSWindowController?
-    private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_: Notification) {
         NSApp.setActivationPolicy(.prohibited)
+        
+        // 初始化后台工作
+        BackgroundWork.start()
+        _ = Applications.shared
         
         // 初始化 DockitManager
         dockitManager = DockitManager.shared
         
         // 注册快捷键
         DockitShortcuts.register()
-        
-        // 创建设置菜单
-        setupMenu()
 
         // 检查权限状态
         checkAccessibilityPermission()
     }
 
-    private func setupMenu() {
-        let menu = NSMenu()
-        #if DEBUG
-            // 添加开发环境标识菜单项
-            let devItem = NSMenuItem(title: "开发环境", action: nil, keyEquivalent: "")
-            devItem.isEnabled = false  // 设置为不可点击
-            menu.addItem(devItem)
-        #endif
-        menu.addItem(NSMenuItem(title: "设置", action: #selector(openSettings), keyEquivalent: ""))
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "退出", action: #selector(quit), keyEquivalent: ""))
-        
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        if let button = statusItem?.button {
-            // 加载 SVG 图标
-            if let svgPath = Bundle.main.path(forResource: "menubar-icon", ofType: "svg"),
-               let svgData = try? Data(contentsOf: URL(fileURLWithPath: svgPath)) {
-                if let image = NSImage(data: svgData) {
-                    image.size = NSSize(width: 26, height: 24)
-                    image.isTemplate = true  // 这会让图标自动适应系统主题色
-                    
-                    // 保持原始比例
-                    button.image = image
-                }
-            }
-            
-            // 添加这一行来关联菜单
-            statusItem?.menu = menu
-        }
-    }
-
-    @objc private func openSettings() {
+    @objc func openSettings() {
         if settingsWindowController == nil {
             let window = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
@@ -94,7 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate { // Add NS
         NSApp.activate(ignoringOtherApps: true) // Removed to prevent Dock icon appearance
     }
 
-    @objc private func quit() {
+    @objc func quit() {
         // 先取消所有窗口停靠
         DockitManager.shared.undockAllWindows(type: .normal)
 
