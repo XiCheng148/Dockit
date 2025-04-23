@@ -73,7 +73,10 @@ jobs:
             CONFIGURATION_BUILD_DIR=$(pwd)/build/Release \
             CODE_SIGN_IDENTITY="Apple Development" \
             CODE_SIGNING_REQUIRED=YES \
-            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain"
+            DEVELOPMENT_TEAM="${{ secrets.DEVELOPMENT_TEAM_ID }}" \
+            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
+            SKIP_PACKAGE_DEPENDENCIES_RESOLUTION=YES \
+            PACKAGE_SKIP_SIGNING=YES
 
       - name: 🤏 Compress Dockit.app
         run: |
