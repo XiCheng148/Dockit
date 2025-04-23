@@ -54,27 +54,20 @@ jobs:
 
       - name: 🛠️ Build Dockit
         run: |
+          mkdir -p dist # 确保 dist 目录存在，用于存放最终的 zip 文件
           xcodebuild \
-            archive \
+            build \
             -project Dockit.xcodeproj/ \
             -scheme "Dockit" \
             -destination 'generic/platform=macOS' \
-            -archivePath dist/Dockit.xcarchive \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO
-
-      - name: 🥡 Export Dockit.app
-        run: |
-          xcodebuild \
-            -exportArchive \
-            -archivePath dist/Dockit.xcarchive \
-            -exportPath dist/ \
+            -configuration Release \
+            CONFIGURATION_BUILD_DIR=$(pwd)/build/Release \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
 
       - name: 🤏 Compress Dockit.app
         run: |
-          ditto -c -k --sequesterRsrc --keepParent "dist/Dockit.app" "dist/Dockit.zip"
+          ditto -c -k --sequesterRsrc --keepParent "build/Release/Dockit.app" "dist/Dockit.zip"
       
       - name: ⬆️ Upload Dockit
         uses: actions/upload-artifact@v4
