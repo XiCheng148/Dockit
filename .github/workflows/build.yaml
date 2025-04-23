@@ -131,7 +131,7 @@ jobs:
       - name: Generate changelog
         if: steps.determine_tag.outputs.create_new_tag == 'true'
         id: create_release
-        run: npx changelogithub --draft --name ${{ steps.determine_tag.outputs.tag_name }}
+        run: npx changelogithub --name ${{ steps.determine_tag.outputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
