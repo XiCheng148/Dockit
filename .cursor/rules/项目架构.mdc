@@ -1,0 +1,5 @@
+---
+type: always
+---
+
+Dockit是一个macOS窗口管理工具，采用MVC架构。主要功能包括窗口停靠和快速预览。核心组件包括DockitManager（管理窗口操作）、Services（提供各种服务）、Views（UI组件）和Models（数据模型）。

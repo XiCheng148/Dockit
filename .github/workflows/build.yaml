@@ -35,6 +35,31 @@ jobs:
 
       - name: 🔧 Select Xcode
         run: sudo xcode-select -s "/Applications/Xcode_16.2.app"
+        
+      - name: 🔐 设置证书
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASE64 }}
+          KEYCHAIN_PASSWORD: ${{ github.run_id }}
+        run: |
+          # 创建临时证书文件
+          echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+          
+          # 创建临时keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          
+          # 导入证书到keychain
+          security import certificate.p12 -k build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          
+          # 允许codesign访问keychain
+          security list-keychains -s build.keychain
+          
+          # 清理临时文件
+          rm certificate.p12
 
       - name: 🛠️ Build Dockit
         run: |
@@ -46,8 +71,9 @@ jobs:
             -destination 'generic/platform=macOS' \
             -configuration Release \
             CONFIGURATION_BUILD_DIR=$(pwd)/build/Release \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGN_IDENTITY="Apple Development" \
+            CODE_SIGNING_REQUIRED=YES \
+            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain"
 
       - name: 🤏 Compress Dockit.app
         run: |

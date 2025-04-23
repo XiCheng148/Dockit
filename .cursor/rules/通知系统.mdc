@@ -1,0 +1,5 @@
+---
+type: always
+---
+
+项目使用NotchNotification库实现通知功能。所有通知应通过NotificationHelper统一处理，保持通知风格一致。通知类型包括成功、警告、错误等。
