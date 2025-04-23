@@ -13,6 +13,11 @@ on:
         default: false
         description: 'Release new build'
         required: true
+      version:
+        type: string
+        default: ''
+        description: 'Version'
+        required: false
 
 jobs:
   pre-release:
@@ -27,27 +32,6 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ inputs.branch }}
-
-      - name: 🧪 Set Version and Build number
-        run: |
-          # CHANGE EVERY RELEASE:
-          APP_VERSION="0.0.5"
-          APP_BUILD=$(git rev-list --count HEAD)
-          FROM_TAG=$(git describe --tags --abbrev=0 --exclude='prerelease')
-
-          # Set VERSION
-          latest_tag=$APP_VERSION
-          echo "Latest tag: $latest_tag"
-          sed -i -e "/VERSION =/ s/= .*/= $latest_tag/" Dockit/Config.xcconfig
-
-          # Set BUILD_NUMBER
-          latest_commit_number=$APP_BUILD
-          echo "Latest commit number: $latest_commit_number"
-          sed -i -e "/BUILD_NUMBER =/ s/= .*/= $latest_commit_number/" Dockit/Config.xcconfig
-
-          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
-          echo "APP_BUILD=$APP_BUILD" >> $GITHUB_ENV
-          echo "FROM_TAG=$FROM_TAG" >> $GITHUB_ENV
 
       - name: 🔧 Select Xcode
         run: sudo xcode-select -s "/Applications/Xcode_16.2.app"
@@ -75,64 +59,90 @@ jobs:
           name: Dockit
           path: dist/Dockit.zip
 
-      - name: 🏷️ Create/update tag
+      - name: 🤔 Determine Tag
+        id: determine_tag
         uses: actions/github-script@v7
-        if: "${{ inputs.release-new-build }}"
         with:
           script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/prerelease',
-              sha: context.sha
-            }).catch(err => {
-              if (err.status !== 422) throw err;
-              github.rest.git.updateRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: 'tags/prerelease',
-                sha: context.sha
-              });
-            })
+            const { owner, repo } = context.repo;
+            const versionInput = '${{ inputs.version }}';
+            const releaseNewBuild = '${{ inputs.release-new-build }}' === 'true';
 
-      - name: 📰 Build Changelog
-        uses: mikepenz/release-changelog-builder-action@v4
-        if: "${{ inputs.release-new-build }}"
-        with:
-          outputFile: CHANGELOG.md
-          fromTag: ${{ env.FROM_TAG }}
-          toTag: "prerelease"
-          configurationJson: |
-            {
-              "template": "#{{CHANGELOG}}\n## 💭 Uncategorized\n#{{UNCATEGORIZED}}",
-              "pr_template": "- #{{TITLE}} ##{{NUMBER}}",
-              "categories": [
-                {
-                    "title": "## ✨ New Features",
-                    "labels": ["Feature", "Luminare", "Improvement"]
-                },
-                {
-                    "title": "## 🐞 Bug Fixes",
-                    "labels": ["Bug"]
-                },
-                {
-                    "title": "## 🌐 Localization",
-                    "labels": ["Localization"]
+            let tagName = 'prerelease';
+            let createNewTag = false; // 指示是否是新版本发布（非 prerelease 更新）
+            let isPrereleaseOnGitHub = true; // 所有构建都标记为 GitHub 预发布
+
+            if (releaseNewBuild) {
+              createNewTag = true;
+              if (versionInput) {
+                tagName = versionInput;
+                console.log(`Using provided version as tag: ${tagName}`);
+              } else {
+                console.log('No version provided, attempting to determine next tag...');
+                // 获取仓库所有标签
+                const tagsResponse = await github.rest.repos.listTags({ owner, repo });
+                const tags = tagsResponse.data.map(tag => tag.name);
+                console.log(`Found tags: ${tags.join(', ')}`);
+
+                // 筛选出语义化版本标签 (X.Y.Z 或 vX.Y.Z)
+                const semverTags = tags
+                  .filter(name => /^(v?\d+\.\d+\.\d+)$/.test(name))
+                  .sort((a, b) => {
+                    // 简单的语义化版本排序
+                    const parseVer = (s) => s.replace(/^v/, '').split('.').map(Number);
+                    const verA = parseVer(a);
+                    const verB = parseVer(b);
+                    for (let i = 0; i < 3; i++) {
+                      if (verA[i] !== verB[i]) return verA[i] - verB[i];
+                    }
+                    return 0;
+                  });
+
+                console.log(`Found semver tags: ${semverTags.join(', ')}`);
+
+                if (semverTags.length > 0) {
+                  const latestTag = semverTags[semverTags.length - 1];
+                  console.log(`Latest semver tag: ${latestTag}`);
+                  const hasV = latestTag.startsWith('v');
+                  const parts = latestTag.replace(/^v/, '').split('.').map(Number);
+                  parts[2]++; // 增加补丁版本号
+                  tagName = (hasV ? 'v' : '') + parts.join('.');
+                  console.log(`Calculated next tag: ${tagName}`);
+                } else {
+                  tagName = '0.0.1'; // 如果没有找到标签，从 0.0.1 开始
+                  console.log('No existing semver tags found, starting with:', tagName);
                 }
-              ],
-              "empty_template": "- ❌ No changes found"
+              }
+            } else {
+               console.log('Not releasing a new build version, using tag: prerelease');
             }
+
+            // 设置输出
+            core.setOutput('tag_name', tagName);
+            core.setOutput('create_new_tag', createNewTag.toString()); // 输出为字符串 "true" 或 "false"
+            core.setOutput('is_prerelease', isPrereleaseOnGitHub.toString());
+
+      - name: Setup node
+        if: steps.determine_tag.outputs.create_new_tag == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate changelog
+        if: steps.determine_tag.outputs.create_new_tag == 'true'
+        id: create_release
+        run: npx changelogithub --draft --name ${{ steps.determine_tag.outputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🥳 Publish Dev Build
+      - name: 🥳 Publish Build Release
         uses: ncipollo/release-action@v1
-        if: "${{ inputs.release-new-build }}"
         with:
           allowUpdates: true
           artifacts: dist/Dockit.zip
-          commit: main
-          bodyFile: CHANGELOG.md
-          name: "Development Build: ${{ env.APP_VERSION }} (${{ env.APP_BUILD }})"
-          prerelease: true
-          tag: "prerelease"
+          commit: ${{ inputs.branch }}
+          bodyFile: ${{ steps.determine_tag.outputs.create_new_tag == 'true' && 'CHANGELOG.md' || '' }}
+          name: "Build: ${{ steps.determine_tag.outputs.tag_name }}"
+          prerelease: ${{ steps.determine_tag.outputs.is_prerelease == 'true' }}
+          tag: ${{ steps.determine_tag.outputs.tag_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
