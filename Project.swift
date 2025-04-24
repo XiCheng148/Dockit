@@ -49,6 +49,8 @@ let project = Project(
                 "NSHumanReadableCopyright": "Copyright © 2024 XiCheng. All rights reserved.",
                 "LSApplicationCategoryType": "public.app-category.utilities",
                 "LSMinimumSystemVersion": "13.5",
+                "NSAccessibilityUsageDescription": "Accessibility 本应用需要辅助功能权限来检测和管理应用程序窗口。",
+                "NSAppleEventsUsageDescription": "AppleEvents 本应用需要辅助功能权限来检测和管理应用程序窗口。",
                 "CFBundleShortVersionString": .string(appVersion),  // 市场版本号
                 "CFBundleVersion": .string(buildVersion)  // 构建版本号
             ]),
