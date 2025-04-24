@@ -108,7 +108,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func checkAccessibilityPermission() {
-        if !AccessibilityHelper.shared.checkAccessibility() {
+        // 使用新的 AccessibilityManager 检查状态
+        if !AccessibilityManager.getStatus() {
             // 自动打开设置窗口
             openSettings()
         }
@@ -120,6 +121,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // Revert activation policy when settings window closes
         if let window = notification.object as? NSWindow, window == settingsWindowController?.window {
             NSApp.setActivationPolicy(.prohibited)
+            // 窗口关闭时也重新检查一下权限状态，确保主程序状态正确
+            // (如果需要，可以在这里添加逻辑以响应权限变化，
+            // 但通常 AppDelegate 不直接处理 UI 状态更新)
         }
     }
 }

@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 import KeyboardShortcuts
 import LaunchAtLogin
 import Defaults
@@ -113,7 +112,6 @@ struct SliderWithTextField: View {
 struct DockitSettingsView: View {
     @State private var hasAccessibility: Bool = false
     @State private var showingRestartAlert: Bool = false
-    @State private var cancellables = Set<AnyCancellable>()
     
     @ObservedObject private var manager = DockitManager.shared
     
@@ -300,7 +298,7 @@ struct DockitSettingsView: View {
         .background(.background)
         .fixedSize()
         .onAppear {
-            setupAccessibilityMonitoring()
+            updateAccessibilityStatus()
             activateWindow()
             NSApp.setActivationPolicy(.regular)
         }
@@ -344,23 +342,41 @@ struct DockitSettingsView: View {
         }
     }
     
-    private func setupAccessibilityMonitoring() {
-        // 检查初始状态
-        hasAccessibility = AccessibilityHelper.shared.checkAccessibility()
-        
-        // 监听权限变化
-        AccessibilityHelper.shared.accessibilityStatusPublisher
-            .sink { newStatus in
-                if newStatus && !hasAccessibility {
-                    hasAccessibility = true
-                    showingRestartAlert = true
-                }
+    private func updateAccessibilityStatus() {
+        // 使用新的 AccessibilityManager 检查状态
+        let currentStatus = AccessibilityManager.getStatus()
+        if currentStatus != hasAccessibility {
+            hasAccessibility = currentStatus
+            // 如果刚刚获得权限 (从 false 变为 true)，提示重启
+            if hasAccessibility {
+                 // 仅在状态从未授权变为已授权时提示重启
+                 // 注意：这里没有之前 Publisher 的 "变化" 概念，
+                 // 所以每次检查到 true 都可能触发，需要更复杂的逻辑来精确判断"首次"授权
+                 // 简单的处理是，只要是 true 且 alert 未显示，就可能需要提示。
+                 // 或者仅在 requestAccess 成功后提示。
+                 // 为保持简单，暂时移除自动提示，依赖用户手动重启。
+                 // 或者仅在 requestAccessibility 成功后提示。
+                 // showingRestartAlert = true // 暂时注释掉，避免每次 onAppear 都弹窗
             }
-            .store(in: &cancellables)
+        }
     }
     
     private func requestAccessibility() {
-        AccessibilityHelper.shared.requestAccessibility()
+        // 使用新的 AccessibilityManager 请求权限
+        let granted = AccessibilityManager.requestAccess()
+        if granted {
+            // 权限被授予后，立即更新状态并提示重启
+            hasAccessibility = true
+            showingRestartAlert = true
+        } else {
+            // 如果用户拒绝或取消，可以考虑给出提示
+             NotificationHelper.show(
+                 type: .warning,
+                 title: "未授予辅助功能权限"
+             )
+        }
+        // 无论是否成功，都更新一下 UI 显示的状态
+        updateAccessibilityStatus()
     }
     
     private func restartApp() {
