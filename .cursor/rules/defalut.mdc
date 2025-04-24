@@ -1,0 +1,123 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: 
+globs: 
+alwaysApply: true
+---
+您是一位专注于 SwiftUI macOS 开发的窗口停靠工具。请遵循以下准则提供协助：
+
+项目依赖管理：
+- 使用 Tuist 管理项目结构和依赖
+- 支持动态配置和环境变量读取
+- 遵循 Tuist 的项目组织方式
+- 使用 Environment 类型处理环境变量
+
+系统兼容性要求：
+- 最低支持 macOS 13 Ventura
+- SwiftUI 要求 macOS 13 或更高版本
+- 优先使用 macOS 13+ 新特性优化性能
+- 确保项目的 Deployment Target 设置正确
+
+设计规范：
+- 遵循 Apple Human Interface Guidelines
+- 保持界面整洁和简约
+- 确保视觉层次分明
+- 重视细节完整性
+- 优先使用新的设计规范和组件
+
+UI 设计准则：
+- 布局规范：
+  * 合理使用留白
+  * 保持内容和控件并排放置
+  * 确保各元素对齐
+  * 适配不同屏幕尺寸
+  * 适当使用 Emoji 进行界面修饰和强调
+- 视觉设计：
+  * 使用系统标准颜色
+  * 支持浅色/深色模式
+  * 确保文字和背景对比度
+  * 使用系统字体
+- 交互设计：
+  * 实现标准的交互方式
+  * 提供清晰的反馈
+  * 保持导航的一致性
+  * 遵循系统常见的交互模式
+
+第三方库使用规范：
+- Defaults 使用规范：
+  * 使用 Defaults 管理所有 UserDefaults 存储
+  * 统一在扩展中声明所有 Keys
+  * 确保 Key 名称符合 ASCII 且不以 @ 开头
+  * 为每个 Key 提供默认值
+- SwiftUIX 优先级：
+  * 优先使用 SwiftUIX 提供的组件和扩展
+  * 避免重复实现已有功能
+  * 使用其提供的性能优化特性
+  * 遵循其推荐的最佳实践
+- SwifterSwift 使用：
+  * 优先使用其提供的扩展方法
+  * 利用其内置的语法糖优化代码
+  * 使用其性能优化的实现方案
+
+必要的第三方依赖：
+- Defaults: https://github.com/sindresorhus/Defaults
+- DynamicNotchKit: https://github.com/MrKai77/DynamicNotchKit
+- KeyboardShortcuts: https://github.com/sindresorhus/KeyboardShortcuts
+- LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern
+- SwiftUIX: https://github.com/SwiftUIX/SwiftUIX
+- SwifterSwift: https://github.com/SwifterSwift/SwifterSwift
+
+SwiftLint 代码规范：
+- 代码行长度限制：单行不超过 110 字符
+- 函数参数数量：不超过 5 个参数
+- 类型命名规范：
+  * 最小长度 4 个字符
+  * 最大长度 40 字符
+- 变量命名规范：
+  * 使用驼峰命名法
+  * 保持命名的语义化
+  * 避免无意义的缩写
+- 代码格式规范：
+  * 冒号规则：变量定义时紧跟变量名，后面加一个空格
+  * 逗号规则：前不离身，后加空格
+  * 控制语句：if、for、while 等条件不使用括号包裹
+  * 条件返回：条件语句返回值需要换行
+  * 空格使用：运算符前后必须有空格
+  * 括号使用：左括号后和右括号前不能有空格
+
+文档要求：
+- 为公开 API 添加文档注释
+- 标注第三方库使用说明
+- 记录兼容性考虑
+- 说明性能优化点
+- 使用 /// 格式的文档注释
+- 注释需要使用完整的句子
+- 中文注释需要使用空格分隔
+
+错误处理：
+- 使用 Result 类型进行错误处理
+- 提供清晰的错误提示信息
+- 避免强制解包
+- 合理使用 try? 和 try!
+
+性能优化：
+- 优先使用系统原生组件
+- 避免重复造轮子
+- 利用 SwiftUIX 的性能优化特性
+- 合理使用 SwifterSwift 的扩展功能
+
+测试规范：
+- 单元测试覆盖核心功能
+- 使用 XCTest 框架
+- 测试方法名称清晰表达测试目的
+- 每个测试用例只测试一个功能点
+
+软件执行刘
+1. 选择 Xcode 工程文件
+2. 点击从 Xcode 导出 Xcloc 文件临时目录
+3. 读取 Xcloc 文件并展示在侧边栏
+4. 侧边选择后显示全部的国际化字符串在图标

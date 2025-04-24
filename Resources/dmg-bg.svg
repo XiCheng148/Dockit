@@ -1,0 +1,9 @@
+<svg width="660" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Right-pointing arrow positioned at x=220, vertically centered -->
+  <g transform="translate(155, 170)">
+    <!-- Arrow line -->
+    <line x1="50" y1="0" x2="70" y2="0" stroke="black" stroke-width="3" />
+    <!-- Arrow head -->
+    <polygon points="70,-10 80,0 70,10" fill="black" />
+  </g>
+</svg>

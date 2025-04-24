@@ -1,0 +1,60 @@
+{
+  "originHash" : "180cb5fa7233e95b0bc29a44e7c76ebf1be500af5489ed76b6053e333c14676b",
+  "pins" : [
+    {
+      "identity" : "defaults",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sindresorhus/Defaults",
+      "state" : {
+        "revision" : "38925e3cfacf3fb89a81a35b1cd44fd5a5b7e0fa",
+        "version" : "8.2.0"
+      }
+    },
+    {
+      "identity" : "dynamicnotchkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MrKai77/DynamicNotchKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "806462802f67071afbd095814027fea194f5f450"
+      }
+    },
+    {
+      "identity" : "keyboardshortcuts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
+      "state" : {
+        "branch" : "main",
+        "revision" : "045cf174010beb335fa1d2567d18c057b8787165"
+      }
+    },
+    {
+      "identity" : "launchatlogin-modern",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sindresorhus/LaunchAtLogin-Modern",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc"
+      }
+    },
+    {
+      "identity" : "swifterswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwifterSwift/SwifterSwift",
+      "state" : {
+        "revision" : "5a6de915bb80234e1e31b3e3e5f7a7995fc1f4db",
+        "version" : "7.0.0"
+      }
+    },
+    {
+      "identity" : "swiftuix",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftUIX/SwiftUIX",
+      "state" : {
+        "revision" : "e984fd2e08140ad5a95d084be38fe02b774bc15d",
+        "version" : "0.2.3"
+      }
+    }
+  ],
+  "version" : 3
+}

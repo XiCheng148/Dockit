@@ -1,0 +1,88 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  discussions: write
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: macos-14
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.1'
+      
+      - name: Install Tuist
+        run: |
+          brew install tuist
+      
+      - name: Generate Xcode Project
+        run: |
+          # 生成基于时间戳的构建号（格式：YYYYMMDDHHmm）
+          BUILD_NUMBER=$(date "+%Y%m%d%H%M")
+          # 替换 Project.swift 中的占位符
+          sed -i '' "s/@BUILD_NUMBER@/$BUILD_NUMBER/g" Project.swift
+          echo "Build number set to: $BUILD_NUMBER"
+          tuist generate --no-open
+      
+      - name: Build App
+        run: |
+          xcodebuild \
+            -workspace Dockit.xcworkspace \
+            -scheme Dockit \
+            -configuration Release \
+            -derivedDataPath ./DerivedData \
+            -arch arm64 -arch x86_64 \
+            clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+      
+      - name: Create DMG
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "Dockit" \
+            --window-size 500 300 \
+            --icon-size 100 \
+            --icon "Dockit.app" 150 150 \
+            --app-drop-link 350 150 \
+            --no-internet-enable \
+            "Dockit.dmg" \
+            "DerivedData/Build/Products/Release/Dockit.app"
+      
+      - name: Generate Checksums
+        run: |
+          echo "### Dockit ${{ github.ref_name }}" > checksums.txt
+          echo "" >> checksums.txt
+          echo "- Universal Binary (Apple Silicon + Intel)" >> checksums.txt
+          echo "- macOS 13.5+" >> checksums.txt
+          echo "" >> checksums.txt
+          echo "### SHA-256 Checksums" >> checksums.txt
+          echo "\`\`\`" >> checksums.txt
+          shasum -a 256 Dockit.dmg >> checksums.txt
+          echo "\`\`\`" >> checksums.txt
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          files: |
+            Dockit.dmg
+            checksums.txt
+          body_path: checksums.txt
+          draft: false
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
