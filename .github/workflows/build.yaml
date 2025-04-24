@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -13,22 +13,37 @@ jobs:
   build:
     name: Build and Release
     runs-on: macos-14
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
+      - name: Set output
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate changelog
+        id: create_release
+        run: npx changelogithub --draft --name ${{ steps.vars.outputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.1'
-      
+          xcode-version: "16.1"
+
       - name: Install Tuist
         run: |
           brew install tuist
-      
+
       - name: Generate Xcode Project
         run: |
           # 生成基于时间戳的构建号（格式：YYYYMMDDHHmm）
@@ -37,7 +52,7 @@ jobs:
           sed -i '' "s/@BUILD_NUMBER@/$BUILD_NUMBER/g" Project.swift
           echo "Build number set to: $BUILD_NUMBER"
           tuist generate --no-open
-      
+
       - name: Build App
         run: |
           xcodebuild \
@@ -47,7 +62,7 @@ jobs:
             -derivedDataPath ./DerivedData \
             -arch arm64 \
             clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-      
+
       - name: Create DMG
         run: |
           brew install create-dmg
@@ -60,7 +75,7 @@ jobs:
             --no-internet-enable \
             "Dockit.dmg" \
             "DerivedData/Build/Products/Release/Dockit.app"
-      
+
       - name: Generate Checksums
         run: |
           echo "### Dockit ${{ github.ref_name }}" > checksums.txt
@@ -72,7 +87,7 @@ jobs:
           echo "\`\`\`" >> checksums.txt
           shasum -a 256 Dockit.dmg >> checksums.txt
           echo "\`\`\`" >> checksums.txt
-      
+
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
@@ -85,4 +100,4 @@ jobs:
           prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
           generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
