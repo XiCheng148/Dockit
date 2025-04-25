@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -31,7 +30,7 @@ jobs:
 
       - name: Generate changelog
         id: create_release
-        run: npx changelogithub --draft --name ${{ steps.vars.outputs.tag }}
+        run: npx changelogithub --name ${{ steps.vars.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
@@ -48,9 +47,12 @@ jobs:
         run: |
           # 生成基于时间戳的构建号（格式：YYYYMMDDHHmm）
           BUILD_NUMBER=$(date "+%Y%m%d%H%M")
+          APP_VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
           # 替换 Project.swift 中的占位符
           sed -i '' "s/@BUILD_NUMBER@/$BUILD_NUMBER/g" Project.swift
           echo "Build number set to: $BUILD_NUMBER"
+          sed -i '' "s/@APP_VERSION@/$APP_VERSION/g" Project.swift
+          echo "App version set to: $APP_VERSION"
           tuist generate --no-open
 
       - name: Build App
@@ -77,16 +79,19 @@ jobs:
             "DerivedData/Build/Products/Release/Dockit.app"
 
       - name: Generate Checksums
+        id: checksum
         run: |
           echo "### Dockit ${{ github.ref_name }}" > checksums.txt
           echo "" >> checksums.txt
-          echo "- Universal Binary (Apple Silicon + Intel)" >> checksums.txt
+          echo "- Apple Silicon" >> checksums.txt
           echo "- macOS 13.5+" >> checksums.txt
           echo "" >> checksums.txt
           echo "### SHA-256 Checksums" >> checksums.txt
           echo "\`\`\`" >> checksums.txt
-          shasum -a 256 Dockit.dmg >> checksums.txt
+          shasum -a 256 >> checksums.txt
           echo "\`\`\`" >> checksums.txt
+          SHA256_VALUE=$(shasum -a 256 Dockit.dmg | awk '{ print $1 }')
+          echo "sha256=${SHA256_VALUE}" >> $GITHUB_OUTPUT
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -101,3 +106,31 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Homebrew Tap Repository
+        uses: actions/checkout@v4
+        with:
+          repository: XiCheng/homebrew-tap
+          path: homebrew-tap
+          token: ${{ secrets.TAP_REPO_TOKEN }}
+
+      - name: Update Homebrew Formula
+        run: |
+          cd homebrew-tap
+          FORMULA_FILE="Casks/dockit.rb"
+          NEW_TAG="${{ github.ref_name }}"
+          NEW_SHA256="${{ steps.checksum.outputs.sha256 }}"
+          # 设置版本号
+          sed -i '' "s/version \".*\"/version \"${NEW_TAG}\"/" "$FORMULA_FILE"
+          # 设置 SHA256 值
+          sed -i '' "s/sha256 \".*\"/sha256 \"${NEW_SHA256}\"/" "$FORMULA_FILE"
+          echo "Updated $FORMULA_FILE with tag $NEW_TAG and SHA256 $NEW_SHA256"
+
+      - name: Commit and Push Formula Update
+        run: |
+          cd homebrew-tap
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Formula/dockit.rb
+          git commit -m "Update dockit formula to version ${{ github.ref_name }}"
+          git push

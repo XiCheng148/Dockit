@@ -1,6 +1,6 @@
 import ProjectDescription
 // MARK: - Version
-let appVersion = "0.3.5"  // 应用版本号
+let appVersion = "@APP_VERSION@"  // 应用版本号
 let buildVersion = "@BUILD_NUMBER@"  // 构建版本号占位符，会被 GitHub Actions 替换
 
 let project = Project(
