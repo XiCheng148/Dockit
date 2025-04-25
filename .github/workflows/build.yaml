@@ -111,7 +111,7 @@ jobs:
       - name: Checkout Homebrew Tap Repository
         uses: actions/checkout@v4
         with:
-          repository: XiCheng/homebrew-tap
+          repository: XiCheng000/homebrew-tap
           path: homebrew-tap
           token: ${{ secrets.GITHUB_TOKEN }}
 
