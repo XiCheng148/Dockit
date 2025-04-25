@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate changelog
         id: create_release
-        run: npx changelogithub --name ${{ steps.vars.outputs.tag }}
+        run: npx changelogithub --draft --name ${{ steps.vars.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
@@ -89,7 +89,7 @@ jobs:
           echo "" >> checksums.txt
           echo "### SHA-256 Checksums" >> checksums.txt
           echo "\`\`\`" >> checksums.txt
-          shasum -a 256 >> checksums.txt
+          shasum -a 256 Dockit.dmg | awk '{ print $1 }' >> checksums.txt
           echo "\`\`\`" >> checksums.txt
           SHA256_VALUE=$(shasum -a 256 Dockit.dmg | awk '{ print $1 }')
           echo "sha256=${SHA256_VALUE}" >> $GITHUB_OUTPUT
@@ -115,19 +115,19 @@ jobs:
           path: homebrew-tap
           token: ${{ secrets.TAP_REPO_TOKEN }}
 
-      - name: Update Homebrew Formula
+      - name: Update Homebrew Casks
         run: |
           cd homebrew-tap
-          FORMULA_FILE="Casks/dockit.rb"
+          CASKS_FILE="Casks/dockit.rb"
           NEW_TAG="${{ github.ref_name }}"
           NEW_SHA256="${{ steps.checksum.outputs.sha256 }}"
           # 设置版本号
-          sed -i '' "s/version \".*\"/version \"${NEW_TAG}\"/" "$FORMULA_FILE"
+          sed -i '' "s/version \".*\"/version \"${NEW_TAG}\"/" "$CASKS_FILE"
           # 设置 SHA256 值
-          sed -i '' "s/sha256 \".*\"/sha256 \"${NEW_SHA256}\"/" "$FORMULA_FILE"
-          echo "Updated $FORMULA_FILE with tag $NEW_TAG and SHA256 $NEW_SHA256"
+          sed -i '' "s/sha256 \".*\"/sha256 \"${NEW_SHA256}\"/" "$CASKS_FILE"
+          echo "Updated $CASKS_FILE with tag $NEW_TAG and SHA256 $NEW_SHA256"
 
-      - name: Commit and Push Formula Update
+      - name: Commit and Push Casks Update
         run: |
           cd homebrew-tap
           git config --global user.name 'github-actions[bot]'
