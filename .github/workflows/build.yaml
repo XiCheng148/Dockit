@@ -113,7 +113,7 @@ jobs:
         with:
           repository: XiCheng/homebrew-tap
           path: homebrew-tap
-          token: ${{ secrets.TAP_REPO_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Homebrew Formula
         run: |
