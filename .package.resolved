@@ -1,5 +1,5 @@
 {
-  "originHash" : "180cb5fa7233e95b0bc29a44e7c76ebf1be500af5489ed76b6053e333c14676b",
+  "originHash" : "14e0348f7b825fbb459f7d56a0246ea4c8ed258ac7b075a7fdfb355287fecc7b",
   "pins" : [
     {
       "identity" : "defaults",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MrKai77/DynamicNotchKit",
       "state" : {
-        "branch" : "main",
-        "revision" : "806462802f67071afbd095814027fea194f5f450"
+        "revision" : "e13aecf68c6519726aa5315f8fa4501c489ca574",
+        "version" : "0.1.0"
       }
     },
     {
@@ -35,24 +35,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc"
-      }
-    },
-    {
-      "identity" : "swifterswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwifterSwift/SwifterSwift",
-      "state" : {
-        "revision" : "5a6de915bb80234e1e31b3e3e5f7a7995fc1f4db",
-        "version" : "7.0.0"
-      }
-    },
-    {
-      "identity" : "swiftuix",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftUIX/SwiftUIX",
-      "state" : {
-        "revision" : "e984fd2e08140ad5a95d084be38fe02b774bc15d",
-        "version" : "0.2.3"
       }
     }
   ],
