@@ -39,11 +39,11 @@
 
 ## ⭐ Star
 
-<a href="https://star-history.com/#XiCheng000/Dockit&Date">
+<a href="https://star-history.com/#XiCheng148/Dockit&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=XiCheng000/Dockit&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=XiCheng000/Dockit&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=XiCheng000/Dockit&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=XiCheng148/Dockit&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=XiCheng148/Dockit&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=XiCheng148/Dockit&type=Date" />
  </picture>
 </a>
 
@@ -54,7 +54,7 @@ This project is open source under the [GNU General Public License v3.0](LICENSE)
 ## 🙏 Thanks
 
 - [Peninsula](https://github.com/Celve/Peninsula) - Window related specific implementation reference this project
-- [Awesome-Merge-Picture](https://github.com/XiCheng000/Awesome-Merge-Picture) - A tool to quickly create a preview image of a dark 和 light mode project.
+- [Awesome-Merge-Picture](https://github.com/XiCheng148/Awesome-Merge-Picture) - A tool to quickly create a preview image of a dark 和 light mode project.
 - [NotchNotification](https://github.com/Lakr233/NotchNotification) - Notch Notification
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) - Shortcut binding
 - [LaunchAtLogin-Modern](https://github.com/sindresorhus/LaunchAtLogin-Modern) - Auto start on boot
