@@ -30,11 +30,12 @@ jobs:
         with:
           node-version: 20
 
+      # 关键修复：仅在标签推送时生成 changelog
       - name: Generate changelog
         id: create_release
+        if: startsWith(github.ref, 'refs/tags/v')  # 只在标签引用下执行
         run: npx changelogithub --draft --name ${{ steps.vars.outputs.tag }}
         env:
-          # 关键修复：使用内置的 GITHUB_TOKEN 替代自定义的 RELEASE_TOKEN
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Xcode
@@ -111,7 +112,7 @@ jobs:
           shasum -a 256 Dockit-ARM.dmg >> checksums.txt
           echo "\`\`\`" >> checksums.txt
 
-      # 发布
+      # 发布（仅在标签推送时执行）
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
