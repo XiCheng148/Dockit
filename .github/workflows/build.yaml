@@ -34,7 +34,8 @@ jobs:
         id: create_release
         run: npx changelogithub --draft --name ${{ steps.vars.outputs.tag }}
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          # 关键修复：使用内置的 GITHUB_TOKEN 替代自定义的 RELEASE_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -51,10 +52,9 @@ jobs:
           echo "Build number set to: $BUILD_NUMBER"
           tuist generate --no-open
 
-      # 1. 构建 Intel (x86_64) 版本并打包
+      # 构建 Intel 版本并打包
       - name: Build and Package Intel Version
         run: |
-          # 构建 Intel 版本
           xcodebuild \
             -workspace Dockit.xcworkspace \
             -scheme Dockit \
@@ -63,7 +63,6 @@ jobs:
             -arch x86_64 \
             clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
-          # 生成 Intel 版 DMG
           brew install create-dmg
           create-dmg \
             --volname "Dockit (Intel)" \
@@ -75,10 +74,9 @@ jobs:
             "Dockit-Intel.dmg" \
             "DerivedData-Intel/Build/Products/Release/Dockit.app"
 
-      # 2. 构建 Apple Silicon (arm64) 版本并打包
+      # 构建 Apple Silicon 版本并打包
       - name: Build and Package Apple Silicon Version
         run: |
-          # 构建 Apple Silicon 版本
           xcodebuild \
             -workspace Dockit.xcworkspace \
             -scheme Dockit \
@@ -87,7 +85,6 @@ jobs:
             -arch arm64 \
             clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
-          # 生成 Apple Silicon 版 DMG
           create-dmg \
             --volname "Dockit (Apple Silicon)" \
             --window-size 500 300 \
@@ -98,7 +95,7 @@ jobs:
             "Dockit-ARM.dmg" \
             "DerivedData-ARM/Build/Products/Release/Dockit.app"
 
-      # 3. 生成包含两个版本校验和的文件
+      # 生成校验和
       - name: Generate Checksums
         run: |
           echo "### Dockit ${{ github.ref_name }}" > checksums.txt
@@ -114,7 +111,7 @@ jobs:
           shasum -a 256 Dockit-ARM.dmg >> checksums.txt
           echo "\`\`\`" >> checksums.txt
 
-      # 4. 同时发布两个版本的 DMG
+      # 发布
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
