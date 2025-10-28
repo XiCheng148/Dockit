@@ -43,7 +43,7 @@ jobs:
           xcode-version: "16.1"
 
       - name: Install Tuist
-        run: brew install tuist
+        run: brew install tuist@4.36.0
 
       - name: Generate Xcode Project
         run: |
